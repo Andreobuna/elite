@@ -1,0 +1,59 @@
+'use client';
+
+import Link from 'next/link';
+import Image from 'next/image';
+import { Heart } from 'lucide-react';
+import { motion } from 'framer-motion';
+import StarRating from './StarRating';
+
+export interface ProductCardData {
+  id: string;
+  slug: string;
+  title: string;
+  sellingPrice: number | string;
+  basePrice?: number | string;
+  ratingAverage: number | string;
+  ratingCount: number;
+  images: { url: string }[];
+}
+
+export default function ProductCard({ product, index = 0 }: { product: ProductCardData; index?: number }) {
+  const image = product.images?.[0]?.url ?? 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=800';
+  const price = Number(product.sellingPrice);
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 24 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: '-40px' }}
+      transition={{ duration: 0.5, delay: index * 0.05, ease: [0.16, 1, 0.3, 1] }}
+      className="thread-card group rounded-2xl border border-white/5 bg-charcoal/60 p-3 transition-all duration-300 hover:-translate-y-1 hover:border-gold/20"
+    >
+      <Link href={`/product/${product.slug}`} className="block">
+        <div className="relative aspect-square overflow-hidden rounded-xl bg-graphite">
+          <Image
+            src={image}
+            alt={product.title}
+            fill
+            sizes="(max-width: 768px) 50vw, 25vw"
+            className="object-cover transition-transform duration-700 ease-out group-hover:scale-110"
+          />
+          <button
+            aria-label="Add to wishlist"
+            onClick={(e) => e.preventDefault()}
+            className="absolute right-3 top-3 flex h-9 w-9 items-center justify-center rounded-full bg-obsidian/60 text-ivory backdrop-blur-md transition-colors hover:text-gold"
+          >
+            <Heart size={16} />
+          </button>
+        </div>
+        <div className="mt-4 space-y-2 px-1 pb-1">
+          <h3 className="line-clamp-2 font-body text-sm font-medium text-ivory">{product.title}</h3>
+          <StarRating value={Number(product.ratingAverage)} count={product.ratingCount} />
+          <div className="flex items-baseline gap-2">
+            <span className="font-display text-lg font-semibold text-gold">${price.toFixed(2)}</span>
+          </div>
+        </div>
+      </Link>
+    </motion.div>
+  );
+}

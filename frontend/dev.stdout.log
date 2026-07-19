@@ -1,0 +1,14 @@
+
+> elite-x-shop-frontend@1.0.0 dev
+> next dev
+
+  ▲ Next.js 14.2.35
+  - Local:        http://localhost:3001
+  - Environments: .env.local
+
+ ✓ Starting...
+ ✓ Ready in 14.9s
+ ○ Compiling / ...
+ ✓ Compiled / in 21.4s (1673 modules)
+ GET / 200 in 22361ms
+ GET / 200 in 155ms
