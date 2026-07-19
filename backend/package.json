@@ -3,6 +3,9 @@
   "version": "1.0.0",
   "description": "Elite X Shop - Backend API (Node.js, Express, TypeScript, Prisma, PostgreSQL)",
   "main": "dist/server.js",
+  "engines": {
+  "node": "20.x"
+},
   "scripts": {
     "dev": "set APP_PORT=4001&& set CLIENT_URL=http://localhost:3001&& nodemon --watch src --ext ts,json --ignore logs --ignore dist --ignore node_modules --exec ts-node src/server.ts",
     "build": "tsc",
