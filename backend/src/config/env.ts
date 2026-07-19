@@ -12,7 +12,7 @@ function req(name: string, fallback?: string): string {
 }
 
 export const env = {
-  port: parseInt(req('APP_PORT', req('PORT', '4001')), 10),
+port: parseInt(process.env.PORT || process.env.APP_PORT || '4001', 10),
   nodeEnv: req('NODE_ENV', 'development'),
   clientUrl: req('CLIENT_URL', 'http://localhost:3000'),
 
