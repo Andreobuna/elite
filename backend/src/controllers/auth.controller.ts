@@ -106,7 +106,7 @@ export async function register(req: Request, res: Response, next: NextFunction) 
 
 export async function verifyEmail(req: Request, res: Response, next: NextFunction) {
   try {
-    res.json({ message: 'Email verification is currently disabled.' });
+    res.json({ message: 'Email verification is not required.' });
   } catch (err) {
     next(err);
   }
@@ -301,3 +301,4 @@ export async function me(req: AuthedRequest, res: Response, next: NextFunction) 
     });
   }
 }
+
