@@ -116,7 +116,7 @@ export default function RegisterPage() {
                 value={form.password}
                 onChange={(e) => update('password', e.target.value)}
                 className="input-elite pl-11 pr-11"
-                placeholder="â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢"
+                placeholder="Password"
               />
               <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-4 top-1/2 -translate-y-1/2 text-slate hover:text-gold">
                 {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
@@ -137,7 +137,7 @@ export default function RegisterPage() {
               value={form.confirm}
               onChange={(e) => update('confirm', e.target.value)}
               className="input-elite"
-              placeholder="â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢"
+              placeholder="Confirm password"
             />
             {errors.confirm && <p className="mt-1.5 text-xs text-red-400">{errors.confirm}</p>}
           </div>

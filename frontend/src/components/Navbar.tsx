@@ -13,8 +13,8 @@ import { api } from '@/lib/api';
 const links = [
   { href: '/', label: 'Home' },
   { href: '/shop', label: 'Shop' },
-  { href: '/shop?sort=new', label: 'New Arrivals' },
-  { href: '/shop?sort=deals', label: 'Flash Deals' },
+  { href: '/shop?category=sexual-wellness' + String.fromCharCode(38) + 'sort=newest', label: 'New Arrivals' },
+  { href: '/shop?category=sexual-wellness' + String.fromCharCode(38) + 'sort=price_asc', label: 'Flash Deals' },
 ];
 
 export default function Navbar() {

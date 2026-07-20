@@ -6,8 +6,8 @@ const columns = [
     title: 'Shop',
     links: [
       { href: '/shop', label: 'All Products' },
-      { href: '/shop?sort=new', label: 'New Arrivals' },
-      { href: '/shop?sort=deals', label: 'Flash Deals' },
+      { href: '/shop?category=sexual-wellness' + String.fromCharCode(38) + 'sort=newest', label: 'New Arrivals' },
+      { href: '/shop?category=sexual-wellness' + String.fromCharCode(38) + 'sort=price_asc', label: 'Flash Deals' },
       { href: '/wishlist', label: 'Wishlist' },
     ],
   },
