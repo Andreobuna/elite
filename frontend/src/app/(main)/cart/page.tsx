@@ -1,10 +1,11 @@
-'use client';
+﻿'use client';
 
 import Link from 'next/link';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Trash2, Minus, Plus, ArrowRight, ShoppingBag } from 'lucide-react';
 import { api } from '@/lib/api';
+import { formatNaira } from '@/lib/currency';
 import { useCartStore } from '@/store/cartStore';
 
 export default function CartPage() {
@@ -76,7 +77,7 @@ export default function CartPage() {
                       {item.product.title}
                     </Link>
                     {item.variant && <p className="mt-0.5 text-xs text-slate">{item.variant.name}</p>}
-                    <p className="mt-1 font-display text-gold">${Number(item.product.sellingPrice).toFixed(2)}</p>
+                    <p className="mt-1 font-display text-gold">{formatNaira(Number(item.product.sellingPrice) + Number(item.variant?.priceDelta ?? 0))}</p>
                   </div>
                   <div className="flex items-center rounded-full border border-white/10">
                     <button onClick={() => updateQty(item.id, item.quantity - 1)} className="p-2 text-ivory hover:text-gold"><Minus size={14} /></button>
@@ -95,15 +96,15 @@ export default function CartPage() {
             <h2 className="font-display text-lg font-semibold text-ivory">Order Summary</h2>
             <div className="mt-4 flex justify-between text-sm text-slate">
               <span>Subtotal</span>
-              <span className="text-ivory">${subtotal.toFixed(2)}</span>
+              <span className="text-ivory">{formatNaira(subtotal)}</span>
             </div>
             <div className="mt-2 flex justify-between text-sm text-slate">
               <span>Shipping</span>
-              <span className="text-ivory">{subtotal > 50 ? 'Free' : '$5.99'}</span>
+              <span className="text-ivory">{subtotal > 50000 ? 'Free' : formatNaira(5990)}</span>
             </div>
             <div className="mt-4 flex justify-between border-t border-white/10 pt-4 font-display text-lg text-ivory">
               <span>Total</span>
-              <span className="text-gold">${(subtotal + (subtotal > 50 ? 0 : 5.99)).toFixed(2)}</span>
+              <span className="text-gold">{formatNaira(subtotal + (subtotal > 50000 ? 0 : 5990))}</span>
             </div>
             <Link href="/checkout" className="btn-gold mt-6 w-full">
               Checkout <ArrowRight size={16} />
@@ -114,3 +115,4 @@ export default function CartPage() {
     </main>
   );
 }
+

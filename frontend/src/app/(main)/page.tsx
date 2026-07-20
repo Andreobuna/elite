@@ -11,16 +11,16 @@ import ProductCard, { ProductCardData } from '@/components/ProductCard';
 
 const categoryShowcase = [
   { name: 'Sexual Wellness', slug: 'sexual-wellness', image: 'https://images.unsplash.com/photo-1588596692308-1f2b7c4c8d89?w=600' },
-  { name: 'Massagers', slug: 'massagers', image: 'https://images.unsplash.com/photo-1531746790731-6c087fecd65a?w=600' },
-  { name: 'Couples', slug: 'couples', image: 'https://images.unsplash.com/photo-1556228578-0d85b1a8f3f8?w=600' },
+  { name: 'Vibrators', slug: 'vibrators', image: 'https://images.unsplash.com/photo-1531746790731-6c087fecd65a?w=600' },
+  { name: 'Accessories', slug: 'accessories', image: 'https://images.unsplash.com/photo-1556228578-0d85b1a8f3f8?w=600' },
   { name: 'Lubricants', slug: 'lubricants', image: 'https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?w=600' },
 ];
 
 const trustBadges = [
-  { icon: ShieldCheck, label: 'Verified Listings', detail: 'Every product comes from the live catalog' },
+  { icon: ShieldCheck, label: 'Verified Listings', detail: 'Every item is reviewed before it goes live' },
   { icon: Truck, label: 'Discreet Shipping', detail: 'Tracked delivery with plain packaging' },
   { icon: RefreshCcw, label: 'Easy Returns', detail: 'Simple return flow on eligible items' },
-  { icon: Sparkles, label: 'Transparent Pricing', detail: 'Markup shown, never hidden' },
+  { icon: Sparkles, label: 'Transparent Pricing', detail: 'Prices are shown in naira' },
 ];
 
 function useProducts(params: Record<string, string> = {}) {
@@ -63,8 +63,8 @@ export default function HomePage() {
             for <span className='text-shimmer'>adult wellness</span>
           </motion.h1>
           <motion.p initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, delay: 0.25 }} className='mt-6 max-w-xl text-base text-slate-light sm:text-lg'>
-            Browse the live API catalog for sexual wellness essentials, massagers, couples toys,
-            and lubricants with transparent pricing and discreet delivery.
+            Browse a curated adult wellness catalog with sex toys, accessories, lubricants, and discreet delivery in naira.
+            
           </motion.p>
           <motion.div initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, delay: 0.4 }} className='mt-10 flex flex-col gap-4 sm:flex-row'>
             <Link href='/shop' className='btn-gold'>
@@ -115,13 +115,13 @@ export default function HomePage() {
         <div className='mb-10 flex items-end justify-between'>
           <div>
             <p className='section-label mb-3'>Trending New Arrivals</p>
-            <h2 className='font-display text-3xl font-semibold text-ivory sm:text-4xl'>Toy-oriented products from the live catalog</h2>
+            <h2 className='font-display text-3xl font-semibold text-ivory sm:text-4xl'>Toy-oriented products from the curated catalog</h2>
           </div>
           <Link href='/adult-wellness' className='hidden items-center gap-1 text-sm text-gold hover:text-gold-light sm:flex'>
             Open guide <ArrowRight size={14} />
           </Link>
         </div>
-        <ProductGrid query={trendingToys} emptyHint='The live catalog has toy-oriented sexual wellness products, but no exact pocket-pussy label was found.' />
+        <ProductGrid query={trendingToys} emptyHint='The catalog has toy-oriented sexual wellness products, but no exact pocket-pussy label was found.' />
       </section>
 
       <section className='mx-auto max-w-7xl px-6 py-10 pb-24'>
@@ -131,7 +131,7 @@ export default function HomePage() {
             <h2 className='font-display text-3xl font-semibold text-ivory sm:text-4xl'>Top rated items for the full store experience</h2>
           </div>
         </div>
-        <ProductGrid query={featuredWellness} columns={4} emptyHint='The live catalog is already connected to the API and database.' />
+        <ProductGrid query={featuredWellness} columns={4} emptyHint='The catalog is loaded with curated adult wellness products.' />
       </section>
     </main>
   );
@@ -165,3 +165,5 @@ function ProductGrid({ query, columns = 4, emptyHint }: { query: ReturnType<type
     </div>
   );
 }
+
+

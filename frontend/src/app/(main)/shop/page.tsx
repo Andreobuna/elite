@@ -65,7 +65,7 @@ function ShopInner() {
       <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
         <p className="section-label mb-3">The Full Collection</p>
         <h1 className="font-display text-4xl font-semibold text-ivory">Shop All Products</h1>
-        <p className="mt-3 max-w-2xl text-sm text-slate-light">Sexual wellness comes first here. The default view opens on that catalog, with all other categories one click away.</p>
+        <p className="mt-3 max-w-2xl text-sm text-slate-light">Sexual wellness comes first here. The default view opens on that collection, with all other categories one click away.</p>
       </motion.div>
 
       <div className="mt-10 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
@@ -134,3 +134,4 @@ export default function ShopPage() {
     </Suspense>
   );
 }
+

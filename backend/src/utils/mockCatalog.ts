@@ -1,76 +1,83 @@
-﻿import type { RemoteProduct } from './cjdropshipping';
+﻿import type { RemoteProduct } from './aliexpress';
 
-const images = [
-  'https://images.unsplash.com/photo-1588596692308-1f2b7c4c8d89?w=800',
-  'https://images.unsplash.com/photo-1583468982228-19d0c9c1f2f7?w=800',
-  'https://images.unsplash.com/photo-1586402187878-34d6d8d5c10c?w=800',
-  'https://images.unsplash.com/photo-1515377905703-c4788e51af15?w=800',
-  'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=800',
-  'https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?w=800',
-  'https://images.unsplash.com/photo-1556228578-0d85b1a8f3f8?w=800',
-  'https://images.unsplash.com/photo-1531746790731-6c087fecd65a?w=800',
+const TYPES = ['vibrator', 'dildo', 'pocket toy', 'wand massager', 'couples toy', 'bullet toy', 'stroker', 'massage wand', 'cleaning kit', 'storage case', 'lubricant set', 'silicone sleeve'];
+const FINISHES = ['Classic', 'Mini', 'Pro', 'Max', 'Lite', 'Ultra', 'Pulse', 'Flex'];
+const MATERIALS = ['soft-touch silicone', 'matte silicone', 'body-safe polymer', 'silky polymer', 'smooth finish', 'textured grip'];
+const HIGHLIGHTS = ['amber', 'rose', 'emerald', 'indigo', 'crimson', 'plum', 'gold', 'smoke'];
+
+const SEEDS = [
+  { name: 'Pulse', category: 'Sexual Wellness', detail: 'Quiet rechargeable formats for discreet daily use.', price: 9800, rating: 4.8, ratingCount: 1220, stock: 180, accent: 'Midnight' },
+  { name: 'Aura', category: 'Sexual Wellness', detail: 'Ergonomic silhouettes with body-safe finishes.', price: 11200, rating: 4.7, ratingCount: 980, stock: 165, accent: 'Blush' },
+  { name: 'Nova', category: 'Sexual Wellness', detail: 'High-output designs tuned for controlled comfort.', price: 14500, rating: 4.9, ratingCount: 1430, stock: 140, accent: 'Plum' },
+  { name: 'Wave', category: 'Sexual Wellness', detail: 'Wand-style performers with deeper vibration patterns.', price: 16800, rating: 4.9, ratingCount: 1495, stock: 120, accent: 'Ivory' },
+  { name: 'Lush', category: 'Sexual Wellness', detail: 'Compact pocket toys made for travel and storage.', price: 8600, rating: 4.6, ratingCount: 760, stock: 210, accent: 'Graphite' },
+  { name: 'Bond', category: 'Couples', detail: 'Shared-use toy designs with secure fit and remote control.', price: 17900, rating: 4.7, ratingCount: 870, stock: 135, accent: 'Crimson' },
+  { name: 'Silk', category: 'Lubricants', detail: 'Clean-feeling lubricant sets and companion care products.', price: 5200, rating: 4.5, ratingCount: 430, stock: 320, accent: 'Clear' },
+  { name: 'Halo', category: 'Accessories', detail: 'Discreet storage and cleaning accessories for private use.', price: 4100, rating: 4.4, ratingCount: 300, stock: 280, accent: 'Slate' },
+  { name: 'Drift', category: 'Accessories', detail: 'Travel pouches, cases, and protective sleeves for essentials.', price: 5600, rating: 4.5, ratingCount: 390, stock: 260, accent: 'Olive' },
+  { name: 'Vanta', category: 'Sexual Wellness', detail: 'Compact stimulation tools with refined, quiet operation.', price: 13100, rating: 4.8, ratingCount: 1120, stock: 155, accent: 'Onyx' },
+  { name: 'Ember', category: 'Sexual Wellness', detail: 'Textured designs with a softer profile and balanced response.', price: 12400, rating: 4.7, ratingCount: 940, stock: 148, accent: 'Copper' },
+  { name: 'Cove', category: 'Sexual Wellness', detail: 'Slim profile stimulators with easy-clean surfaces.', price: 10400, rating: 4.6, ratingCount: 720, stock: 190, accent: 'Navy' },
 ];
 
-type Seed = {
-  name: string;
-  category: string;
-  type: string;
-  detail: string;
-  price: number;
-  rating: number;
-  ratingCount: number;
-  stock: number;
-  accent: string;
-};
+function hashText(value: string) {
+  let hash = 0;
+  for (let i = 0; i < value.length; i += 1) hash = (hash * 31 + value.charCodeAt(i)) >>> 0;
+  return hash;
+}
 
-const sexSeeds: Seed[] = [
-  { name: 'Pulse', category: 'Sexual Wellness', type: 'sex toy vibrator', detail: 'Quiet USB-C rechargeable design with multiple intensity levels.', price: 29.9, rating: 4.7, ratingCount: 812, stock: 180, accent: 'Midnight' },
-  { name: 'Aura', category: 'Sexual Wellness', type: 'sex toy personal stimulator', detail: 'Water-resistant ergonomic body-safe silicone build.', price: 34.5, rating: 4.8, ratingCount: 1044, stock: 160, accent: 'Rose' },
-  { name: 'Bond', category: 'Couples', type: 'sex toy couples toy', detail: 'Designed for shared use with flexible fit and remote control.', price: 42, rating: 4.6, ratingCount: 621, stock: 140, accent: 'Crimson' },
-  { name: 'Lush', category: 'Accessories', type: 'sex toy storage case', detail: 'Discreet travel case with a soft-touch finish and locking zipper.', price: 18.75, rating: 4.5, ratingCount: 287, stock: 240, accent: 'Graphite' },
-  { name: 'Silk', category: 'Lubricants', type: 'personal lubricant', detail: 'Long-lasting formula with a clean finish and easy rinse-off.', price: 14.2, rating: 4.4, ratingCount: 531, stock: 300, accent: 'Clear' },
-  { name: 'Wave', category: 'Sexual Wellness', type: 'sex toy wand massager', detail: 'Broad-head wand with deep-vibration output and travel lock.', price: 49.99, rating: 4.9, ratingCount: 1165, stock: 120, accent: 'Ivory' },
-  { name: 'Nova', category: 'Massagers', type: 'sex toy massage toy', detail: 'Flexible body-safe design tuned for precise pressure control.', price: 37.4, rating: 4.7, ratingCount: 742, stock: 155, accent: 'Plum' },
-  { name: 'Halo', category: 'Accessories', type: 'sex toy cleaning kit', detail: 'Compact care kit with gentle cleanser, cloth, and case.', price: 12.6, rating: 4.3, ratingCount: 219, stock: 260, accent: 'Slate' },
-];
+function pick<T>(items: T[], index: number) {
+  return items[index % items.length];
+}
 
-const bagSeeds: Seed[] = [
-  { name: 'Metro', category: 'Bags', type: 'tote bag', detail: 'Spacious everyday carry bag with reinforced handles and a clean structured shape.', price: 34.9, rating: 4.6, ratingCount: 642, stock: 220, accent: 'Sand' },
-  { name: 'Harbor', category: 'Bags', type: 'handbag', detail: 'Polished handbag with a removable strap and secure top closure.', price: 39.5, rating: 4.7, ratingCount: 514, stock: 180, accent: 'Black' },
-  { name: 'Drift', category: 'Backpacks', type: 'backpack', detail: 'Lightweight backpack with padded straps and laptop sleeve.', price: 46.2, rating: 4.8, ratingCount: 688, stock: 150, accent: 'Olive' },
-  { name: 'Transit', category: 'Travel Bags', type: 'travel bag', detail: 'Weekend travel bag with structured sides and easy-access pockets.', price: 52.9, rating: 4.6, ratingCount: 433, stock: 130, accent: 'Navy' },
-  { name: 'Cove', category: 'Purses', type: 'purse', detail: 'Compact purse with a crossbody strap and organized interior.', price: 31.25, rating: 4.5, ratingCount: 375, stock: 240, accent: 'Burgundy' },
-  { name: 'Summit', category: 'Shoulder Bags', type: 'shoulder bag', detail: 'Soft shoulder bag with a roomy main compartment and gold-tone hardware.', price: 43.8, rating: 4.7, ratingCount: 562, stock: 170, accent: 'Taupe' },
-  { name: 'Nomad', category: 'Duffel Bags', type: 'duffel bag', detail: 'Durable duffel bag sized for gym, work, or short trips.', price: 48.4, rating: 4.6, ratingCount: 491, stock: 145, accent: 'Charcoal' },
-  { name: 'Arc', category: 'Crossbody Bags', type: 'crossbody bag', detail: 'Slim crossbody bag with an adjustable strap and secure zip pocket.', price: 28.6, rating: 4.4, ratingCount: 298, stock: 260, accent: 'Espresso' },
-];
+function svgDataUri(title: string, category: string, accent: string, seedIndex: number, variantIndex: number, imageIndex: number) {
+  const hash = hashText(`${title}-${seedIndex}-${variantIndex}-${imageIndex}`);
+  const hueA = hash % 360;
+  const hueB = (hash + 38 + imageIndex * 11) % 360;
+  const hueC = (hash + 78 + variantIndex * 7) % 360;
+  const safeTitle = title.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  const safeCategory = category.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 900" fill="none"><defs><linearGradient id="g${hash}" x1="120" y1="100" x2="780" y2="820" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="hsl(${hueA} 75% 18%)"/><stop offset="55%" stop-color="hsl(${hueB} 72% 28%)"/><stop offset="100%" stop-color="hsl(${hueC} 60% 12%)"/></linearGradient><radialGradient id="r${hash}" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(450 260) rotate(90) scale(350 340)"><stop offset="0%" stop-color="rgba(255,255,255,0.32)"/><stop offset="70%" stop-color="rgba(255,255,255,0.08)"/><stop offset="100%" stop-color="rgba(255,255,255,0)"/></radialGradient></defs><rect width="900" height="900" rx="64" fill="url(#g${hash})"/><circle cx="166" cy="138" r="118" fill="rgba(255,255,255,0.08)"/><circle cx="740" cy="184" r="146" fill="rgba(255,255,255,0.06)"/><ellipse cx="450" cy="500" rx="285" ry="236" fill="url(#r${hash})"/><rect x="132" y="640" width="636" height="118" rx="54" fill="rgba(0,0,0,0.24)"/><path d="M338 306c0-55 46-100 102-100h20c56 0 102 45 102 100v168c0 78-64 142-142 142s-142-64-142-142V306Z" fill="rgba(255,255,255,0.22)"/><path d="M386 340c0-22 18-40 40-40h48c22 0 40 18 40 40v134c0 42-34 76-76 76s-76-34-76-76V340Z" fill="rgba(255,255,255,0.38)"/><circle cx="450" cy="304" r="35" fill="rgba(255,255,255,0.52)"/><text x="74" y="104" fill="rgba(255,255,255,0.84)" font-size="30" font-family="Arial, Helvetica, sans-serif" letter-spacing="4">ELITE X</text><text x="74" y="154" fill="rgba(255,255,255,0.72)" font-size="18" font-family="Arial, Helvetica, sans-serif" letter-spacing="2">${safeCategory}</text><text x="74" y="806" fill="rgba(255,255,255,0.92)" font-size="28" font-family="Arial, Helvetica, sans-serif">${safeTitle}</text><text x="74" y="842" fill="rgba(255,255,255,0.68)" font-size="17" font-family="Arial, Helvetica, sans-serif">Generated product artwork</text></svg>`;
+  return 'data:image/svg+xml;utf8,' + encodeURIComponent(svg);
+}
 
-function buildFromSeeds(seeds: Seed[], startIndex: number): RemoteProduct[] {
+function buildImages(title: string, category: string, accent: string, seedIndex: number, variantIndex: number) {
+  return [0, 1].map((imageIndex) => svgDataUri(title, category, accent, seedIndex, variantIndex, imageIndex));
+}
+
+export function buildMockCatalog(): RemoteProduct[] {
   const catalog: RemoteProduct[] = [];
-  let index = startIndex;
+  let index = 1001;
 
-  for (const seed of seeds) {
-    for (let variant = 1; variant <= 12; variant += 1) {
-      const labels = ['Classic', 'Mini', 'Pro', 'Max', 'Prime', 'Lite', 'Ultra', 'Flex'];
-      const shades = ['Onyx', 'Cherry', 'Violet', 'Pearl', 'Graphite', 'Blush', 'Jet', 'Copper'];
-      const label = labels[variant % labels.length];
-      const shade = shades[variant % shades.length];
-      const title = seed.name + ' ' + seed.type + ' ' + label;
+  for (let seedIndex = 0; seedIndex < SEEDS.length; seedIndex += 1) {
+    const seed = SEEDS[seedIndex];
+    for (let variantIndex = 0; variantIndex < 90; variantIndex += 1) {
+      const type = pick(TYPES, seedIndex * 11 + variantIndex);
+      const finish = pick(FINISHES, seedIndex * 5 + variantIndex);
+      const material = pick(MATERIALS, seedIndex + variantIndex * 2);
+      const highlight = pick(HIGHLIGHTS, seedIndex * 3 + variantIndex);
+      const title = `${seed.name} ${type} ${finish}`;
+      const identifier = `CJ-MOCK-${String(index).padStart(5, '0')}`;
+      const stock = seed.stock + variantIndex * 4 + seedIndex * 3;
+      const price = Math.round((seed.price + seedIndex * 160 + variantIndex * 175) * 100) / 100;
+      const ratingAverage = Math.min(5, Math.max(4, Math.round((seed.rating - (variantIndex % 4) * 0.03 + (seedIndex % 3) * 0.01) * 10) / 10));
+      const ratingCount = seed.ratingCount + variantIndex * 14 + seedIndex * 19;
+      const description = `${seed.detail} ${material} build with a ${highlight} accent and a discreet, travel-friendly profile.`;
 
       catalog.push({
-        aliexpressId: 'CJ-MOCK-' + index,
+        aliexpressId: identifier,
         title,
-        description: seed.detail + ' ' + seed.accent + ' finish with a ' + shade.toLowerCase() + ' accent.',
-        images: [images[index % images.length]],
-        basePrice: Math.round((seed.price + variant * 1.75) * 100) / 100,
-        currency: 'USD',
-        stock: seed.stock + variant * 5,
+        description,
+        images: buildImages(title, seed.category, seed.accent, seedIndex, variantIndex),
+        basePrice: price,
+        currency: 'NGN',
+        stock,
         category: seed.category,
-        ratingAverage: Math.min(5, Math.round((seed.rating - (variant % 3) * 0.03) * 10) / 10),
-        ratingCount: seed.ratingCount + variant * 12,
+        ratingAverage,
+        ratingCount,
         variants: [
-          { sku: 'CJ-MOCK-' + index + '-A', name: 'Color: ' + seed.accent, priceDelta: 0, stock: seed.stock + variant * 5, attributes: { color: seed.accent.toLowerCase() } },
-          { sku: 'CJ-MOCK-' + index + '-B', name: 'Color: ' + shade, priceDelta: 1.5, stock: seed.stock + variant * 3, attributes: { color: shade.toLowerCase() } },
+          { sku: `${identifier}-STD`, name: 'Standard', priceDelta: 0, stock, attributes: { size: 'standard', finish: finish.toLowerCase(), accent: seed.accent.toLowerCase() } },
+          { sku: `${identifier}-DELUXE`, name: 'Deluxe', priceDelta: 1800, stock: Math.max(0, stock - 12), attributes: { size: 'deluxe', finish: 'premium', accent: seed.accent.toLowerCase() } },
         ],
       });
       index += 1;
@@ -78,8 +85,4 @@ function buildFromSeeds(seeds: Seed[], startIndex: number): RemoteProduct[] {
   }
 
   return catalog;
-}
-
-export function buildMockCatalog(): RemoteProduct[] {
-  return [...buildFromSeeds(sexSeeds, 1001), ...buildFromSeeds(bagSeeds, 2001)];
 }

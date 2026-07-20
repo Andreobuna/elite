@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useState } from 'react';
 import { useParams } from 'next/navigation';
@@ -7,6 +7,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Heart, Minus, Plus, ShieldCheck, Truck, ZoomIn } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { api } from '@/lib/api';
+import { formatNaira } from '@/lib/currency';
 import { useAuthStore } from '@/store/authStore';
 import { useCartStore } from '@/store/cartStore';
 import StarRating from '@/components/StarRating';
@@ -107,9 +108,9 @@ export default function ProductDetailPage() {
             <StarRating value={Number(product.ratingAverage)} count={product.ratingCount} />
           </div>
           <p className="mt-6 font-display text-4xl font-bold text-gold">
-            ${Number(product.sellingPrice).toFixed(2)}
+            {formatNaira(product.sellingPrice)}
           </p>
-          <p className="mt-2 text-sm text-slate">{product.stock > 0 ? `In stock — ${product.stock} available` : 'Out of stock'}</p>
+          <p className="mt-2 text-sm text-slate">{product.stock > 0 ? `In stock - ${product.stock} available` : 'Out of stock'}</p>
 
           <p className="mt-6 leading-relaxed text-slate-light">{product.description}</p>
 
@@ -180,3 +181,4 @@ export default function ProductDetailPage() {
     </main>
   );
 }
+

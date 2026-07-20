@@ -149,7 +149,7 @@ function mapProduct(item: any): RemoteProduct | null {
     description: String(item.description_url ?? item.description ?? item.productDescription ?? title),
     images: imagesFrom(item).length ? imagesFrom(item) : ['https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=800'],
     basePrice: parsePrice(item.item_offer_site_sale_price ?? item.product_min_price ?? item.product_price ?? item.discount_price_cents ?? item.original_price_cents),
-    currency: String(item.currency_code ?? item.base_currency_code ?? item.currency ?? 'USD'),
+    currency: String(item.currency_code ?? item.base_currency_code ?? item.currency ?? 'NGN'),
     stock: Number(item.quantity ?? item.inventoryNum ?? item.totalInventoryNum ?? item.stock ?? 0) || 0,
     category: String(item.categories ?? item.category_name ?? item.category ?? item.categoryName ?? 'AliExpress'),
     ratingAverage: Number(item.avg_evaluation_rating ?? item.average_star ?? item.ratingAverage ?? 0) || 0,
@@ -226,4 +226,5 @@ export function applyMarkup(basePrice: number, markupPercent: number): number {
 }
 
 export { MOCK_CATALOG };
+
 

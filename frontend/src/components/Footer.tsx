@@ -1,4 +1,4 @@
-import Link from 'next/link';
+﻿import Link from 'next/link';
 import Logo from './Logo';
 
 const columns = [
@@ -37,8 +37,8 @@ export default function Footer() {
           <div>
             <Logo size={34} />
             <p className="mt-4 max-w-xs text-sm leading-relaxed text-slate">
-              Curated goods, honest prices. Every product is sourced, verified, and
-              priced transparently before it reaches you.
+              Curated adult wellness goods, honest prices. Every product is verified and
+              priced in naira before it reaches you.
             </p>
           </div>
           {columns.map((col) => (
@@ -60,9 +60,11 @@ export default function Footer() {
         </div>
         <div className="mt-14 flex flex-col items-center justify-between gap-4 border-t border-white/5 pt-8 text-xs text-slate md:flex-row">
           <p>© {new Date().getFullYear()} Elite X Shop. All rights reserved.</p>
-          <p>Secured checkout · Verified imports · 10% transparent markup</p>
+          <p>Secured checkout · Verified catalog · Transparent markup</p>
         </div>
       </div>
     </footer>
   );
 }
+
+

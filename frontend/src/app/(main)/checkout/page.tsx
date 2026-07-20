@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
@@ -7,6 +7,7 @@ import { useQuery } from '@tanstack/react-query';
 import { CreditCard, Loader2, ShieldCheck } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { api } from '@/lib/api';
+import { formatNaira } from '@/lib/currency';
 
 const providers = [
   { id: 'STRIPE', label: 'Card (Stripe)' },
@@ -94,7 +95,7 @@ export default function CheckoutPage() {
               ))}
             </div>
             <p className="mt-4 flex items-center gap-2 text-xs text-slate">
-              <ShieldCheck size={14} className="text-gold" /> Payments are processed securely — card details never touch our servers.
+              <ShieldCheck size={14} className="text-gold" /> Payments are processed securely - card details never touch our servers.
             </p>
           </motion.div>
         </div>
@@ -102,13 +103,13 @@ export default function CheckoutPage() {
         <div className="h-fit rounded-2xl border border-gold/15 bg-charcoal/60 p-6">
           <h2 className="font-display text-lg font-semibold text-ivory">Order Total</h2>
           <div className="mt-4 flex justify-between text-sm text-slate">
-            <span>Subtotal</span><span className="text-ivory">${subtotal.toFixed(2)}</span>
+            <span>Subtotal</span><span className="text-ivory">{formatNaira(subtotal)}</span>
           </div>
           <div className="mt-2 flex justify-between text-sm text-slate">
-            <span>Shipping</span><span className="text-ivory">{subtotal > 50 ? 'Free' : '$5.99'}</span>
+            <span>Shipping</span><span className="text-ivory">{subtotal > 50000 ? 'Free' : formatNaira(5990)}</span>
           </div>
           <div className="mt-4 flex justify-between border-t border-white/10 pt-4 font-display text-lg text-ivory">
-            <span>Total</span><span className="text-gold">${(subtotal + (subtotal > 50 ? 0 : 5.99)).toFixed(2)}</span>
+            <span>Total</span><span className="text-gold">{formatNaira(subtotal + (subtotal > 50000 ? 0 : 5990))}</span>
           </div>
           <button type="submit" disabled={loading} className="btn-gold mt-6 w-full disabled:opacity-60">
             {loading ? <Loader2 size={18} className="animate-spin" /> : 'Place Order'}
@@ -118,3 +119,4 @@ export default function CheckoutPage() {
     </main>
   );
 }
+

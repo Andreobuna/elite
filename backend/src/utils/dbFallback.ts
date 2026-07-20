@@ -328,7 +328,7 @@ export function fallbackStoreCatalog(products: RemoteProduct[], markupPercent: n
       basePrice: product.basePrice,
       markupPercent,
       sellingPrice: Math.round(product.basePrice * (1 + markupPercent / 100) * 100) / 100,
-      currency: product.currency,
+      currency: 'NGN',
       stock: product.stock,
       ratingAverage: product.ratingAverage,
       ratingCount: product.ratingCount,
@@ -344,4 +344,5 @@ export function fallbackStoreCatalog(products: RemoteProduct[], markupPercent: n
     })
   );
 }
+
 

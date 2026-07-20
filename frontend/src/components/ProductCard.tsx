@@ -1,10 +1,11 @@
-'use client';
+﻿'use client';
 
 import Link from 'next/link';
 import Image from 'next/image';
 import { Heart } from 'lucide-react';
 import { motion } from 'framer-motion';
 import StarRating from './StarRating';
+import { formatNaira } from '@/lib/currency';
 
 export interface ProductCardData {
   id: string;
@@ -50,10 +51,11 @@ export default function ProductCard({ product, index = 0 }: { product: ProductCa
           <h3 className="line-clamp-2 font-body text-sm font-medium text-ivory">{product.title}</h3>
           <StarRating value={Number(product.ratingAverage)} count={product.ratingCount} />
           <div className="flex items-baseline gap-2">
-            <span className="font-display text-lg font-semibold text-gold">${price.toFixed(2)}</span>
+            <span className="font-display text-lg font-semibold text-gold">{formatNaira(price)}</span>
           </div>
         </div>
       </Link>
     </motion.div>
   );
 }
+

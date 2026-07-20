@@ -1,10 +1,11 @@
-'use client';
+﻿'use client';
 
 import Link from 'next/link';
 import { useQuery } from '@tanstack/react-query';
 import { motion } from 'framer-motion';
 import { Package, ChevronRight, Truck } from 'lucide-react';
 import { api } from '@/lib/api';
+import { formatNaira } from '@/lib/currency';
 
 const statusColor: Record<string, string> = {
   PENDING: 'text-slate border-slate/30',
@@ -72,7 +73,7 @@ export default function OrdersPage() {
                   <span className={`rounded-full border px-3 py-1 text-xs font-medium ${statusColor[order.status] ?? 'text-slate border-slate/30'}`}>
                     {order.status}
                   </span>
-                  <span className="hidden font-display text-gold sm:block">${Number(order.grandTotal).toFixed(2)}</span>
+                  <span className="hidden font-display text-gold sm:block">{formatNaira(order.grandTotal)}</span>
                   <ChevronRight size={18} className="text-slate" />
                 </div>
               </Link>
@@ -83,3 +84,4 @@ export default function OrdersPage() {
     </main>
   );
 }
+

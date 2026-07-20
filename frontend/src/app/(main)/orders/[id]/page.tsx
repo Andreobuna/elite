@@ -1,10 +1,11 @@
-'use client';
+﻿'use client';
 
 import { useParams } from 'next/navigation';
 import { useQuery } from '@tanstack/react-query';
 import { motion } from 'framer-motion';
 import { CheckCircle2, Circle, Truck, Package, Home } from 'lucide-react';
 import { api } from '@/lib/api';
+import { formatNaira } from '@/lib/currency';
 
 const STEPS = ['PENDING', 'PAID', 'PROCESSING', 'SHIPPED', 'DELIVERED'];
 const stepIcons = [Package, CheckCircle2, Package, Truck, Home];
@@ -100,21 +101,22 @@ export default function OrderDetailPage() {
               <p className="text-sm font-medium text-ivory">{item.titleSnapshot}</p>
               <p className="text-xs text-slate">Qty {item.quantity}</p>
             </div>
-            <p className="font-display text-gold">${(Number(item.unitPrice) * item.quantity).toFixed(2)}</p>
+            <p className="font-display text-gold">{formatNaira(Number(item.unitPrice) * item.quantity)}</p>
           </div>
         ))}
       </div>
 
       <div className="glass-panel mt-6 rounded-2xl p-6">
-        <div className="flex justify-between text-sm text-slate"><span>Subtotal</span><span className="text-ivory">${Number(data.subtotal).toFixed(2)}</span></div>
-        <div className="mt-2 flex justify-between text-sm text-slate"><span>Shipping</span><span className="text-ivory">${Number(data.shippingTotal).toFixed(2)}</span></div>
+        <div className="flex justify-between text-sm text-slate"><span>Subtotal</span><span className="text-ivory">{formatNaira(data.subtotal)}</span></div>
+        <div className="mt-2 flex justify-between text-sm text-slate"><span>Shipping</span><span className="text-ivory">{formatNaira(data.shippingTotal)}</span></div>
         {Number(data.discountTotal) > 0 && (
-          <div className="mt-2 flex justify-between text-sm text-slate"><span>Discount</span><span className="text-emerald-300">-${Number(data.discountTotal).toFixed(2)}</span></div>
+          <div className="mt-2 flex justify-between text-sm text-slate"><span>Discount</span><span className="text-emerald-300">-{formatNaira(data.discountTotal)}</span></div>
         )}
         <div className="mt-4 flex justify-between border-t border-white/10 pt-4 font-display text-lg text-ivory">
-          <span>Total</span><span className="text-gold">${Number(data.grandTotal).toFixed(2)}</span>
+          <span>Total</span><span className="text-gold">{formatNaira(data.grandTotal)}</span>
         </div>
       </div>
     </main>
   );
 }
+
