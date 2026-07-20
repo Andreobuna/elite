@@ -1,4 +1,4 @@
-﻿import dotenv from 'dotenv';
+import dotenv from 'dotenv';
 dotenv.config();
 
 function req(name: string, fallback?: string): string {
@@ -11,10 +11,35 @@ function req(name: string, fallback?: string): string {
   return String(value).trim();
 }
 
+function parseOrigins(...values: Array<string | undefined>): string[] {
+  const origins = new Set<string>();
+
+  for (const value of values) {
+    if (!value) continue;
+
+    for (const origin of value.split(',')) {
+      const normalized = origin.trim();
+      if (normalized) {
+        origins.add(normalized);
+      }
+    }
+  }
+
+  return [...origins];
+}
+
+const clientUrls = parseOrigins(
+  process.env.CORS_ORIGINS,
+  process.env.FRONTEND_URL,
+  process.env.CLIENT_URL,
+  'http://localhost:3000'
+);
+
 export const env = {
-port: parseInt(process.env.PORT || process.env.APP_PORT || '4001', 10),
+  port: parseInt(process.env.PORT || process.env.APP_PORT || '4001', 10),
   nodeEnv: req('NODE_ENV', 'development'),
-  clientUrl: req('CLIENT_URL', 'http://localhost:3000'),
+  clientUrl: clientUrls[0],
+  clientUrls,
 
   databaseUrl: req('DATABASE_URL'),
   databaseUrlPooler: req('DATABASE_URL_POOLER'),
