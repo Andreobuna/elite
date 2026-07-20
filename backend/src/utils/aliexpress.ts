@@ -159,7 +159,14 @@ function mapProduct(item: any): RemoteProduct | null {
 }
 
 function filterMockCatalog(keyword: string) {
-  return keyword ? MOCK_CATALOG.filter((p) => p.title.toLowerCase().includes(keyword.toLowerCase())) : MOCK_CATALOG;
+  if (!keyword) return MOCK_CATALOG;
+  const needle = keyword.toLowerCase();
+  return MOCK_CATALOG.filter(
+    (p) =>
+      p.title.toLowerCase().includes(needle) ||
+      p.description.toLowerCase().includes(needle) ||
+      p.category.toLowerCase().includes(needle)
+  );
 }
 
 function mapListResponse(raw: any): RemoteProduct[] {
@@ -197,8 +204,8 @@ export async function searchProducts(keyword = '', page = 1): Promise<RemoteProd
     }
     return products;
   } catch (err) {
-    logger.error('[aliexpress] searchProducts failed', err);
-    throw err;
+    logger.warn('[aliexpress] searchProducts failed, falling back to mock catalog', err);
+    return filterMockCatalog(keyword);
   }
 }
 
@@ -219,3 +226,4 @@ export function applyMarkup(basePrice: number, markupPercent: number): number {
 }
 
 export { MOCK_CATALOG };
+

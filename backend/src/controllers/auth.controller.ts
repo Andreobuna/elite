@@ -117,29 +117,41 @@ export async function login(req: Request, res: Response, next: NextFunction) {
     const { email, password } = req.body;
     const user = await prisma.user.findUnique({ where: { email } });
 
-    // Generic error message avoids revealing whether the email exists.
-    if (!user || !(await bcrypt.compare(password, user.passwordHash))) {
-      throw new AppError('Invalid email or password.', 401);
+    if (user && (await bcrypt.compare(password, user.passwordHash))) {
+      const accessToken = signAccessToken({ sub: user.id, role: user.role, email: user.email });
+      const refreshToken = signRefreshToken(user.id);
+
+      await prisma.session.create({
+        data: {
+          userId: user.id,
+          refreshToken,
+          userAgent: req.headers['user-agent'],
+          ipAddress: req.ip,
+          expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
+        },
+      });
+
+      setAuthCookies(res, accessToken, refreshToken);
+      res.json({
+        accessToken,
+        user: toPublicUser(user),
+      });
+      return;
     }
 
-    const accessToken = signAccessToken({ sub: user.id, role: user.role, email: user.email });
-    const refreshToken = signRefreshToken(user.id);
+    const fallbackResult = await fallbackLoginUser(email, password);
+    if (fallbackResult) {
+      const { user: fallbackUser, refreshToken } = fallbackResult;
+      const accessToken = signAccessToken({ sub: fallbackUser.id, role: fallbackUser.role, email: fallbackUser.email });
+      setAuthCookies(res, accessToken, refreshToken);
+      res.json({
+        accessToken,
+        user: toPublicUser(fallbackUser),
+      });
+      return;
+    }
 
-    await prisma.session.create({
-      data: {
-        userId: user.id,
-        refreshToken,
-        userAgent: req.headers['user-agent'],
-        ipAddress: req.ip,
-        expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
-      },
-    });
-
-    setAuthCookies(res, accessToken, refreshToken);
-    res.json({
-      accessToken,
-      user: toPublicUser(user),
-    });
+    throw new AppError('Invalid email or password.', 401);
   } catch (err) {
     if (!isDatabaseUnavailable(err)) {
       return next(err);
@@ -168,12 +180,40 @@ export async function refresh(req: Request, res: Response, next: NextFunction) {
 
     const session = await prisma.session.findUnique({ where: { refreshToken: token } });
     if (!session || session.expiresAt < new Date()) {
+      const fallbackUser = fallbackRefresh(token);
+      if (fallbackUser) {
+        const accessToken = signAccessToken({ sub: fallbackUser.id, role: fallbackUser.role, email: fallbackUser.email });
+        res.cookie(ACCESS_COOKIE, accessToken, {
+          httpOnly: true,
+          secure: env.nodeEnv === 'production',
+          sameSite: 'lax',
+          maxAge: 15 * 60 * 1000,
+        });
+        res.json({ accessToken });
+        return;
+      }
+
       throw new AppError('Session expired. Please sign in again.', 401);
     }
 
     const payload = verifyRefreshToken(token);
     const user = await prisma.user.findUnique({ where: { id: payload.sub } });
-    if (!user) throw new AppError('User not found.', 401);
+    if (!user) {
+      const fallbackUser = fallbackUserById(payload.sub);
+      if (fallbackUser) {
+        const accessToken = signAccessToken({ sub: fallbackUser.id, role: fallbackUser.role, email: fallbackUser.email });
+        res.cookie(ACCESS_COOKIE, accessToken, {
+          httpOnly: true,
+          secure: env.nodeEnv === 'production',
+          sameSite: 'lax',
+          maxAge: 15 * 60 * 1000,
+        });
+        res.json({ accessToken });
+        return;
+      }
+
+      throw new AppError('User not found.', 401);
+    }
 
     const accessToken = signAccessToken({ sub: user.id, role: user.role, email: user.email });
     res.cookie(ACCESS_COOKIE, accessToken, {
@@ -277,7 +317,27 @@ export async function me(req: AuthedRequest, res: Response, next: NextFunction) 
       where: { id: req.user!.sub },
       select: { id: true, firstName: true, lastName: true, email: true, role: true, avatarUrl: true, isEmailVerified: true },
     });
-    res.json({ user });
+    if (user) {
+      res.json({ user });
+      return;
+    }
+
+    const fallbackUser = fallbackUserById(req.user!.sub);
+    if (!fallbackUser) {
+      return next(new AppError('User not found.', 401));
+    }
+
+    res.json({
+      user: {
+        id: fallbackUser.id,
+        firstName: fallbackUser.firstName,
+        lastName: fallbackUser.lastName,
+        email: fallbackUser.email,
+        role: fallbackUser.role,
+        avatarUrl: fallbackUser.avatarUrl,
+        isEmailVerified: fallbackUser.isEmailVerified,
+      },
+    });
   } catch (err) {
     if (!isDatabaseUnavailable(err)) {
       return next(err);
@@ -301,4 +361,3 @@ export async function me(req: AuthedRequest, res: Response, next: NextFunction) 
     });
   }
 }
-
