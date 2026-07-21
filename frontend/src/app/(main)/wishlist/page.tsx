@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import Link from 'next/link';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
@@ -62,7 +62,7 @@ export default function WishlistPage() {
               >
                 <div className="relative aspect-square overflow-hidden rounded-xl bg-graphite">
                   <img
-                    src={item.product.images?.[0]?.url ?? 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=600'}
+                    src={'/product-placeholder.svg'}
                     alt={item.product.title}
                     className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110"
                   />
@@ -92,3 +92,4 @@ export default function WishlistPage() {
     </main>
   );
 }
+

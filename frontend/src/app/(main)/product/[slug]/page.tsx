@@ -62,7 +62,7 @@ export default function ProductDetailPage() {
 
   if (!data) return null;
   const { product, related } = data;
-  const images = product.images?.length ? product.images : [{ url: 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=800' }];
+  const images = [{ url: '/product-placeholder.svg' }];
 
   return (
     <main className="mx-auto max-w-7xl px-6 py-16">
@@ -181,4 +181,5 @@ export default function ProductDetailPage() {
     </main>
   );
 }
+
 

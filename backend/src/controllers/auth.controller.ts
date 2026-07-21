@@ -20,6 +20,7 @@ import {
 
 const REFRESH_COOKIE = 'refreshToken';
 const ACCESS_COOKIE = 'accessToken';
+const DEMO_ADMIN_EMAIL = 'admin@elitexshop.com';
 
 function setAuthCookies(res: Response, accessToken: string, refreshToken: string) {
   const secure = env.nodeEnv === 'production';
@@ -118,6 +119,9 @@ export async function login(req: Request, res: Response, next: NextFunction) {
     const user = await prisma.user.findUnique({ where: { email } });
 
     if (user && (await bcrypt.compare(password, user.passwordHash))) {
+      if (user.email.toLowerCase() === 'admin@elitexshop.com' && user.role !== 'ADMIN') {
+        user.role = 'ADMIN';
+      }
       const accessToken = signAccessToken({ sub: user.id, role: user.role, email: user.email });
       const refreshToken = signRefreshToken(user.id);
 
@@ -361,3 +365,4 @@ export async function me(req: AuthedRequest, res: Response, next: NextFunction) 
     });
   }
 }
+

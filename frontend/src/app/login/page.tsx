@@ -21,6 +21,7 @@ function extractSessionPayload(payload: any) {
 export default function LoginPage() {
   const router = useRouter();
   const setSession = useAuthStore((s) => s.setSession);
+  const clear = useAuthStore((s) => s.clear);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -50,6 +51,7 @@ export default function LoginPage() {
         throw new Error('Login succeeded but the backend response did not include a user and access token.');
       }
 
+      clear();
       setSession(session.user, session.accessToken);
       toast.success('Welcome back, ' + session.user.firstName + '.');
       router.push(session.user.role === 'ADMIN' ? '/admin' : '/');
@@ -168,3 +170,4 @@ export default function LoginPage() {
     </main>
   );
 }
+

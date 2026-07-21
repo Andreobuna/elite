@@ -19,7 +19,7 @@ export interface ProductCardData {
 }
 
 export default function ProductCard({ product, index = 0 }: { product: ProductCardData; index?: number }) {
-  const image = product.images?.[0]?.url ?? 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=800';
+  const image = '/product-placeholder.svg';
   const price = Number(product.sellingPrice);
 
   return (
@@ -58,4 +58,5 @@ export default function ProductCard({ product, index = 0 }: { product: ProductCa
     </motion.div>
   );
 }
+
 

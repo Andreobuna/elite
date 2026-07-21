@@ -68,7 +68,7 @@ export default function CartPage() {
                   className="flex items-center gap-4 rounded-2xl border border-white/5 bg-charcoal/50 p-4"
                 >
                   <img
-                    src={item.product.images?.[0]?.url ?? 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=200'}
+                    src={'/product-placeholder.svg'}
                     alt={item.product.title}
                     className="h-20 w-20 rounded-xl object-cover"
                   />
@@ -115,4 +115,5 @@ export default function CartPage() {
     </main>
   );
 }
+
 

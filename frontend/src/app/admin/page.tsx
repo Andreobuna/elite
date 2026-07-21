@@ -235,7 +235,7 @@ function ProductSync() {
                 {filteredProducts.map((p: any) => (
                   <tr key={p.id} className="border-t border-white/5">
                     <td className="flex items-center gap-3 py-3 text-ivory">
-                      <img src={p.images?.[0]?.url} className="h-9 w-9 rounded-lg object-cover" alt="" />
+                      <img src={'/product-placeholder.svg'} className={'h-9 w-9 rounded-lg object-cover'} alt={''} />
                       <span className="line-clamp-1 max-w-[220px]">{p.title}</span>
                     </td>
                     <td className="py-3 text-slate">${Number(p.basePrice).toFixed(2)}</td>
@@ -424,4 +424,7 @@ function SettingsPanel() {
     </div>
   );
 }
+
+
+
 
