@@ -1,7 +1,7 @@
-﻿import bcrypt from 'bcryptjs';
+import bcrypt from 'bcryptjs';
 import { v4 as uuidv4 } from 'uuid';
 import { env } from '../config/env';
-import type { RemoteProduct } from './aliexpress';
+import type { RemoteProduct } from './cjdropshipping';
 
 export type FallbackRole = 'CUSTOMER' | 'ADMIN';
 
@@ -45,7 +45,7 @@ export interface FallbackCatalogVariant {
 
 export interface FallbackCatalogProduct {
   id: string;
-  aliexpressId: string | null;
+  cjProductId: string | null;
   title: string;
   slug: string;
   description: string;
@@ -247,7 +247,7 @@ export function fallbackUpsertCatalogCategory(name: string, imageUrl?: string | 
 }
 
 export function fallbackUpsertCatalogProduct(input: {
-  aliexpressId: string;
+  cjProductId: string;
   title: string;
   slug: string;
   description: string;
@@ -264,12 +264,12 @@ export function fallbackUpsertCatalogProduct(input: {
   variants: Array<{ sku: string; name: string; priceDelta: number; stock: number; attributes: Record<string, string> }>;
 }) {
   const category = fallbackUpsertCatalogCategory(input.categoryName);
-  const id = 'fallback-product-' + input.aliexpressId;
-  const existing = productsByAlias.get(input.aliexpressId) ?? productsBySlug.get(input.slug) ?? null;
+  const id = 'fallback-product-' + input.cjProductId;
+  const existing = productsByAlias.get(input.cjProductId) ?? productsBySlug.get(input.slug) ?? null;
   const createdAt = existing?.createdAt ?? new Date();
   const product: FallbackCatalogProduct = {
     id: existing?.id ?? id,
-    aliexpressId: input.aliexpressId,
+    cjProductId: input.cjProductId,
     title: input.title,
     slug: input.slug,
     description: input.description,
@@ -306,14 +306,14 @@ export function fallbackUpsertCatalogProduct(input: {
 
   if (existing) {
     productsBySlug.delete(existing.slug);
-    if (existing.aliexpressId) {
-      productsByAlias.delete(existing.aliexpressId);
+    if (existing.cjProductId) {
+      productsByAlias.delete(existing.cjProductId);
     }
   }
 
   productsBySlug.set(product.slug, product);
-  if (product.aliexpressId) {
-    productsByAlias.set(product.aliexpressId, product);
+  if (product.cjProductId) {
+    productsByAlias.set(product.cjProductId, product);
   }
   return cloneProduct(product);
 }
@@ -321,9 +321,9 @@ export function fallbackUpsertCatalogProduct(input: {
 export function fallbackStoreCatalog(products: RemoteProduct[], markupPercent: number) {
   return products.map((product) =>
     fallbackUpsertCatalogProduct({
-      aliexpressId: product.aliexpressId,
+      cjProductId: product.cjProductId,
       title: product.title,
-      slug: toSlug(product.title) + '-' + product.aliexpressId.slice(-4),
+      slug: toSlug(product.title) + '-' + product.cjProductId.slice(-4),
       description: product.description,
       basePrice: product.basePrice,
       markupPercent,

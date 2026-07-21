@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import { useState } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
@@ -193,7 +193,7 @@ function ProductSync() {
       toast.success(res.data.message);
       queryClient.invalidateQueries({ queryKey: ['admin-products'] });
     } catch {
-      toast.error('Sync failed. Check your AliExpress API key in .env.');
+      toast.error('Sync failed. Check your CJ API key in .env.');
     } finally {
       setSyncing(false);
     }
@@ -203,7 +203,7 @@ function ProductSync() {
     <div>
       <h1 className="font-display text-2xl font-semibold text-ivory">Product Synchronization</h1>
       <p className="mt-1 text-sm text-slate">
-        Pull products from AliExpress. Without live API credentials configured on the server, this uses the
+        Pull products from CJ Dropshipping. Without live API credentials configured on the server, this uses the
         bundled mock catalog so you can test the full pipeline end-to-end. Last sync: {lastSyncCount === null ? 'Not run yet' : lastSyncCount + ' products'}
       </p>
 
@@ -211,7 +211,7 @@ function ProductSync() {
         <input
           value={keyword}
           onChange={(e) => setKeyword(e.target.value)}
-          placeholder="Keyword to search on AliExpress (leave blank to sync catalog)"
+          placeholder="Keyword to search on CJ Dropshipping (leave blank to sync catalog)"
           className="input-elite flex-1"
         />
         <button onClick={runSync} disabled={syncing} className="btn-gold shrink-0 disabled:opacity-60">
@@ -374,7 +374,7 @@ function SettingsPanel() {
 
       <div className="mt-6 rounded-2xl border border-gold/15 bg-charcoal/50 p-6">
         <div className="flex items-center gap-2 text-gold"><Percent size={18} /><h2 className="font-display text-lg">Default Markup Percentage</h2></div>
-        <p className="mt-2 text-sm text-slate">Applied automatically to every product synced from AliExpress. Existing products are recalculated immediately when you save.</p>
+        <p className="mt-2 text-sm text-slate">Applied automatically to every product synced from CJ Dropshipping. Existing products are recalculated immediately when you save.</p>
         <div className="mt-4 flex items-center gap-3">
           <input
             type="number" step="0.1" min="0" value={markup}
@@ -414,8 +414,8 @@ function SettingsPanel() {
           </ul>
         </div>
         <div className="rounded-2xl border border-white/5 bg-charcoal/50 p-6">
-          <h3 className="font-display text-ivory">AliExpress Connection</h3>
-          <p className="mt-1 text-xs text-slate">Add your ALIEXPRESS_APP_KEY in backend/.env to go live.</p>
+          <h3 className="font-display text-ivory">CJ Dropshipping Connection</h3>
+          <p className="mt-1 text-xs text-slate">Add your CJ_API_KEY in backend/.env to go live.</p>
           <div className="mt-3 flex items-center gap-2 rounded-lg bg-white/[0.02] px-3 py-2 text-sm text-ivory">
             <TrendingUp size={14} className="text-gold" /> Using mock catalog fallback until configured
           </div>

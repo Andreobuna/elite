@@ -1,7 +1,7 @@
 # Elite X Shop
 
 A full-stack e-commerce platform: customers shop entirely through Elite X Shop,
-while products, prices, and inventory sync in from AliExpress with a
+while products, prices, and inventory sync in from CJ Dropshipping with a
 transparent, admin-configurable markup (10% by default) applied automatically.
 
 ```
@@ -21,7 +21,7 @@ need **your own** credentials before they're fully live:
 
 | Integration | Status without your keys | To go live |
 |---|---|---|
-| **AliExpress** | Falls back to a bundled mock catalog (6 sample products) so sync, pricing, and the admin catalog UI all work immediately | Register at [open.aliexpress.com](https://open.aliexpress.com), create an app, add `ALIEXPRESS_APP_KEY` / `ALIEXPRESS_APP_SECRET` / `ALIEXPRESS_TRACKING_ID` to `backend/.env` |
+| **CJ Dropshipping** | Falls back to a bundled mock catalog (6 sample products) so sync, pricing, and the admin catalog UI all work immediately | Register at the CJ Dropshipping developer portal, create an app, add `CJ_API_KEY` / `CJ_API_SECRET` / `CJ_ACCESS_TOKEN` to `backend/.env` |
 | **Payments** (Stripe/PayPal/Paystack/Flutterwave) | Orders are created and a payment record is stubbed as `PENDING` | Add the relevant secret keys to `backend/.env`; wire up `backend/src/utils/payments.ts` to each provider's real charge/session API |
 | **Email** (Nodemailer) | Emails are logged to the console instead of sent | Add real SMTP credentials (e.g. from Mailtrap, Postmark, SES) to `backend/.env` |
 
@@ -63,7 +63,7 @@ password after first login.**
 
 Once the backend is running, sign in as the admin and trigger a sync from
 **Admin Dashboard → Product Sync → Run Sync** to populate the shop with the
-mock AliExpress catalog (or a real one, once your API keys are set).
+mock CJ Dropshipping catalog (or a real one, once your API keys are set).
 
 ### 3. Frontend
 
@@ -84,8 +84,8 @@ email is unconfigured by default), verify it, then sign in.
 
 ### Backend (`backend/`)
 - `prisma/schema.prisma` — full normalized schema (users, products, orders,
-  payments, coupons, audit logs, AliExpress sync logs, etc.)
-- `src/utils/aliexpress.ts` — AliExpress adapter with automatic mock-catalog
+  payments, coupons, audit logs, CJ Dropshipping sync logs, etc.)
+- `src/utils/cjdropshipping.ts` — CJ Dropshipping adapter with automatic mock-catalog
   fallback; this is the file to extend once you have live API access
 - `src/utils/payments.ts` — payment provider stubs (Stripe/PayPal/
   Paystack/Flutterwave) — replace with real SDK calls

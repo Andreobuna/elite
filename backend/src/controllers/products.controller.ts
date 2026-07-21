@@ -1,4 +1,4 @@
-﻿import { Request, Response, NextFunction } from 'express';
+import { Request, Response, NextFunction } from 'express';
 import { prisma } from '../config/prisma';
 import { AppError } from '../middleware/errorHandler';
 import { searchProducts, getProductDetail, applyMarkup } from '../utils/cjdropshipping';
@@ -115,8 +115,8 @@ export async function listCategories(req: Request, res: Response, next: NextFunc
   }
 }
 
-// --- Admin: AliExpress sync ---
-// Pulls products from AliExpress (or the bundled mock catalog, if no API
+// --- Admin: CJ Dropshipping sync ---
+// Pulls products from CJ Dropshipping (or the bundled mock catalog, if no API
 // credentials are configured yet) and upserts them with markup applied.
 export async function syncFromCjDropshipping(req: Request, res: Response, next: NextFunction) {
   const { keyword = '' } = req.body as { keyword?: string };
@@ -138,10 +138,11 @@ export async function syncFromCjDropshipping(req: Request, res: Response, next: 
         });
       }
 
-      const slug = slugify(rp.title) + '-' + rp.aliexpressId.slice(-4);
+      const cjProductId = rp.cjProductId;
+      const slug = slugify(rp.title) + '-' + cjProductId.slice(-4);
 
       const product = await prisma.product.upsert({
-        where: { aliexpressId: rp.aliexpressId },
+        where: { aliexpressId: cjProductId },
         update: {
           title: rp.title,
           description: rp.description,
@@ -154,11 +155,11 @@ export async function syncFromCjDropshipping(req: Request, res: Response, next: 
           categoryId: category.id,
           images: {
             deleteMany: {},
-            create: rp.images.map((url, i) => ({ url, position: i })),
+            create: rp.images.map((url: string, i: number) => ({ url, position: i })),
           },
           variants: {
             deleteMany: {},
-            create: rp.variants.map((v) => ({
+            create: rp.variants.map((v: any) => ({
               sku: v.sku,
               name: v.name,
               priceDelta: v.priceDelta,
@@ -168,7 +169,7 @@ export async function syncFromCjDropshipping(req: Request, res: Response, next: 
           },
         },
         create: {
-          aliexpressId: rp.aliexpressId,
+          aliexpressId: cjProductId,
           title: rp.title,
           slug,
           description: rp.description,
@@ -179,9 +180,9 @@ export async function syncFromCjDropshipping(req: Request, res: Response, next: 
           ratingAverage: rp.ratingAverage,
           ratingCount: rp.ratingCount,
           categoryId: category.id,
-          images: { create: rp.images.map((url, i) => ({ url, position: i })) },
+          images: { create: rp.images.map((url: string, i: number) => ({ url, position: i })) },
           variants: {
-            create: rp.variants.map((v) => ({
+            create: rp.variants.map((v: any) => ({
               sku: v.sku,
               name: v.name,
               priceDelta: v.priceDelta,
@@ -200,7 +201,7 @@ export async function syncFromCjDropshipping(req: Request, res: Response, next: 
       data: { itemsSynced: synced, finishedAt: new Date(), status: 'SUCCESS' },
     });
 
-    res.json({ message: `Synced ${synced} product(s) from AliExpress.`, synced });
+    res.json({ message: `Synced ${synced} product(s) from CJ Dropshipping.`, synced });
   } catch (err) {
     if (!isDatabaseUnavailable(err)) {
       return next(err);
@@ -221,7 +222,7 @@ export async function syncFromCjDropshipping(req: Request, res: Response, next: 
 export async function getProductDetailPreview(req: Request, res: Response, next: NextFunction) {
   try {
     const detail = await getProductDetail(req.params.cjProductId);
-    if (!detail) throw new AppError('Product not found on AliExpress.', 404);
+    if (!detail) throw new AppError('Product not found on CJ Dropshipping.', 404);
     res.json({ product: detail });
   } catch (err) {
     next(err);

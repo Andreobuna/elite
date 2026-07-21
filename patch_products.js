@@ -1,0 +1,11 @@
+﻿const fs = require('fs');
+const p = 'backend/src/controllers/products.controller.ts';
+let l = fs.readFileSync(p, 'utf8').split(/\r?\n/);
+l[117] = '// --- Admin: CJ Dropshipping sync ---';
+l[118] = '// Pulls products from CJ Dropshipping (or the bundled mock catalog, if no API';
+l[119] = '// credentials are configured yet) and upserts them with markup applied.';
+l[156] = '            create: rp.images.map((url: string, i: number) => ({ url, position: i })),';
+l[160] = '            create: rp.variants.map((v: any) => ({';
+l[181] = '          images: { create: rp.images.map((url: string, i: number) => ({ url, position: i })) },';
+l[183] = '            create: rp.variants.map((v: any) => ({';
+fs.writeFileSync(p, l.join('\n'));

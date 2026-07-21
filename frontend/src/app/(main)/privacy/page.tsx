@@ -17,7 +17,7 @@ const sections = [
   },
   {
     title: '5. Third-Party Sharing',
-    body: 'Product and inventory data is synchronized from AliExpress for the purpose of listing and fulfilling orders. Shipping details are shared with couriers strictly to deliver your order.',
+    body: 'Product and inventory data is synchronized from CJ Dropshipping for the purpose of listing and fulfilling orders. Shipping details are shared with couriers strictly to deliver your order.',
   },
   {
     title: '6. Your Rights',

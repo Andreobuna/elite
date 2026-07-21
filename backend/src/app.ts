@@ -48,7 +48,7 @@ app.get("/api/health", async (req, res) => {
       status: "ok",
       service: "elite-x-shop-api",
       database: "ok",
-      aliexpressConfigured: Boolean(env.aliexpress.appKey && env.aliexpress.appSecret),
+      cjConfigured: Boolean(env.cj.apiKey && env.cj.apiSecret),
     });
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error);
@@ -61,7 +61,7 @@ app.get("/api/health", async (req, res) => {
         status: "ok",
         service: "elite-x-shop-api",
         database: "fallback",
-        aliexpressConfigured: Boolean(env.aliexpress.appKey && env.aliexpress.appSecret),
+        cjConfigured: Boolean(env.cj.apiKey && env.cj.apiSecret),
         error: env.nodeEnv !== "production" ? message : undefined,
       });
     }
@@ -70,7 +70,7 @@ app.get("/api/health", async (req, res) => {
       status: "degraded",
       service: "elite-x-shop-api",
       database: "down",
-      aliexpressConfigured: Boolean(env.aliexpress.appKey && env.aliexpress.appSecret),
+      cjConfigured: Boolean(env.cj.apiKey && env.cj.apiSecret),
       error: env.nodeEnv !== "production" ? message : "unavailable",
     });
   }

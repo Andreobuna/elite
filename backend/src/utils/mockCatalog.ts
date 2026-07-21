@@ -1,4 +1,4 @@
-﻿import type { RemoteProduct } from './aliexpress';
+import type { RemoteProduct } from './cjdropshipping';
 
 const TYPES = ['vibrator', 'dildo', 'pocket toy', 'wand massager', 'couples toy', 'bullet toy', 'stroker', 'massage wand', 'cleaning kit', 'storage case', 'lubricant set', 'silicone sleeve'];
 const FINISHES = ['Classic', 'Mini', 'Pro', 'Max', 'Lite', 'Ultra', 'Pulse', 'Flex'];
@@ -65,7 +65,7 @@ export function buildMockCatalog(): RemoteProduct[] {
       const description = `${seed.detail} ${material} build with a ${highlight} accent and a discreet, travel-friendly profile.`;
 
       catalog.push({
-        aliexpressId: identifier,
+        cjProductId: identifier,
         title,
         description,
         images: buildImages(title, seed.category, seed.accent, seedIndex, variantIndex),

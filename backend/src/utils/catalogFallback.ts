@@ -12,15 +12,15 @@ export function categoryFromName(name: string) {
 }
 
 export function mockSlug(product: RemoteProduct) {
-  return slugify(product.title) + '-' + product.aliexpressId.slice(-4);
+  return slugify(product.title) + '-' + product.cjProductId.slice(-4);
 }
 
 export function toMockProduct(product: RemoteProduct) {
   const category = categoryFromName(product.category);
 
   return {
-    id: product.aliexpressId,
-    aliexpressId: product.aliexpressId,
+    id: product.cjProductId,
+    cjProductId: product.cjProductId,
     title: product.title,
     slug: mockSlug(product),
     description: product.description,
@@ -35,7 +35,7 @@ export function toMockProduct(product: RemoteProduct) {
     category,
     categoryId: category.id,
     images: product.images.map((url, index) => ({
-      id: product.aliexpressId + '-image-' + index,
+      id: product.cjProductId + '-image-' + index,
       url,
       altText: product.title,
       position: index,

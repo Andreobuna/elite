@@ -1,4 +1,4 @@
-﻿# Deployment Prep
+# Deployment Prep
 
 ## What is already ready
 - The frontend builds successfully with `npm run build`.
@@ -23,8 +23,8 @@ Set these in your backend host:
 - `JWT_REFRESH_SECRET=<different long random secret>`
 - `JWT_ACCESS_EXPIRES_IN=15m`
 - `JWT_REFRESH_EXPIRES_IN=30d`
-- `ALIEXPRESS_APP_KEY=<optional>`
-- `ALIEXPRESS_APP_SECRET=<optional>`
+- `CJ_API_KEY=<optional>`
+- `CJ_API_SECRET=<optional>`
 - `DEFAULT_MARKUP_PERCENT=10`
 
 Optional but recommended:
