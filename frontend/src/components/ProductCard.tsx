@@ -19,7 +19,14 @@ export interface ProductCardData {
 }
 
 export default function ProductCard({ product, index = 0 }: { product: ProductCardData; index?: number }) {
-  const image = '/product-placeholder.svg';
+  let image = '/product-placeholder.svg';
+  if (product.images) {
+    if (product.images[0]) {
+      if (product.images[0].url) {
+        image = product.images[0].url;
+      }
+    }
+  }
   const price = Number(product.sellingPrice);
 
   return (
@@ -35,6 +42,7 @@ export default function ProductCard({ product, index = 0 }: { product: ProductCa
           <Image
             src={image}
             alt={product.title}
+            unoptimized
             fill
             sizes="(max-width: 768px) 50vw, 25vw"
             className="object-cover transition-transform duration-700 ease-out group-hover:scale-110"

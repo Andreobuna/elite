@@ -8,6 +8,18 @@ import { api } from '@/lib/api';
 import { formatNaira } from '@/lib/currency';
 import { useCartStore } from '@/store/cartStore';
 
+function resolveProductImage(product: { images?: { url?: string }[] }) {
+  let image = '/product-placeholder.svg';
+  if (product.images) {
+    if (product.images[0]) {
+      if (product.images[0].url) {
+        image = product.images[0].url;
+      }
+    }
+  }
+  return image;
+}
+
 export default function CartPage() {
   const queryClient = useQueryClient();
   const setItemCount = useCartStore((s) => s.setItemCount);
@@ -68,7 +80,7 @@ export default function CartPage() {
                   className="flex items-center gap-4 rounded-2xl border border-white/5 bg-charcoal/50 p-4"
                 >
                   <img
-                    src={'/product-placeholder.svg'}
+                    src={resolveProductImage(item.product)}
                     alt={item.product.title}
                     className="h-20 w-20 rounded-xl object-cover"
                   />

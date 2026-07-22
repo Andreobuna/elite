@@ -62,7 +62,17 @@ export default function ProductDetailPage() {
 
   if (!data) return null;
   const { product, related } = data;
-  const images = [{ url: '/product-placeholder.svg' }];
+  let images = [];
+  if (product.images) {
+    for (let i = 0; i < product.images.length; i += 1) {
+      if (product.images[i] && product.images[i].url) {
+        images.push(product.images[i].url);
+      }
+    }
+  }
+  if (!images.length) {
+    images.push('/product-placeholder.svg');
+  }
 
   return (
     <main className="mx-auto max-w-7xl px-6 py-16">
@@ -75,7 +85,7 @@ export default function ProductDetailPage() {
             onMouseLeave={() => setZoomed(false)}
           >
             <motion.img
-              src={images[activeImage].url}
+              src={images[activeImage]}
               alt={product.title}
               animate={{ scale: zoomed ? 1.5 : 1 }}
               transition={{ duration: 0.4, ease: 'easeOut' }}
@@ -93,7 +103,7 @@ export default function ProductDetailPage() {
                   onClick={() => setActiveImage(i)}
                   className={`h-16 w-16 overflow-hidden rounded-lg border-2 transition-colors ${activeImage === i ? 'border-gold' : 'border-white/10'}`}
                 >
-                  <img src={img.url} alt="" className="h-full w-full object-cover" />
+                  <img src={img} alt="" className="h-full w-full object-cover" />
                 </button>
               ))}
             </div>

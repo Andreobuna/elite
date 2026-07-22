@@ -12,6 +12,18 @@ import toast from 'react-hot-toast';
 import { api } from '@/lib/api';
 import Logo from '@/components/Logo';
 
+function resolveProductImage(product: { images?: { url?: string }[] }) {
+  let image = '/product-placeholder.svg';
+  if (product.images) {
+    if (product.images[0]) {
+      if (product.images[0].url) {
+        image = product.images[0].url;
+      }
+    }
+  }
+  return image;
+}
+
 type Tab = 'overview' | 'sync' | 'orders' | 'customers' | 'settings';
 
 const tabs: { id: Tab; label: string; icon: any }[] = [
@@ -235,7 +247,7 @@ function ProductSync() {
                 {filteredProducts.map((p: any) => (
                   <tr key={p.id} className="border-t border-white/5">
                     <td className="flex items-center gap-3 py-3 text-ivory">
-                      <img src={'/product-placeholder.svg'} className={'h-9 w-9 rounded-lg object-cover'} alt={''} />
+                      <img src={resolveProductImage(p)} className={'h-9 w-9 rounded-lg object-cover'} alt={p.title} />
                       <span className="line-clamp-1 max-w-[220px]">{p.title}</span>
                     </td>
                     <td className="py-3 text-slate">${Number(p.basePrice).toFixed(2)}</td>
