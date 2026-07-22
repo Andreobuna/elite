@@ -20,6 +20,25 @@ export interface RemoteProduct {
 const MOCK_CATALOG = buildMockCatalog();
 const PAGE_SIZE = 100;
 const TOKEN_SAFETY_WINDOW_MS = 300000;
+const ADULT_CATALOG_TERMS = [
+  'sex toy',
+  'sex toys',
+  'sexual wellness',
+  'adult toy',
+  'adult toys',
+  'vibrator',
+  'dildo',
+  'pocket toy',
+  'wand massager',
+  'couples toy',
+  'bullet toy',
+  'stroker',
+  'massage wand',
+  'cleaning kit',
+  'storage case',
+  'lubricant set',
+  'silicone sleeve',
+];
 let cachedAccessToken = env.cj.accessToken || null;
 let cachedRefreshToken = env.cj.refreshToken || null;
 let cachedAccessTokenExpiresAt = 0;
@@ -67,6 +86,38 @@ function arrayFrom(...sources: any[]) {
     if (typeof source === 'object') { const nested = Object.values(source).find((value) => Array.isArray(value)); if (Array.isArray(nested)) return nested; }
   }
   return [];
+}
+
+function normalizeKeyword(keyword: string) {
+  return keyword.trim().toLowerCase().replace(/\s+/g, ' ');
+}
+
+function isAdultCatalogQuery(keyword: string) {
+  const needle = normalizeKeyword(keyword);
+  if (!needle) return false;
+  return ['sex', 'sexual', 'adult', 'wellness', 'toy', 'vibe', 'vibrator', 'dildo', 'stroker'].some((term) => needle.includes(term));
+}
+
+function searchTermsForKeyword(keyword: string) {
+  const normalized = normalizeKeyword(keyword);
+  if (!normalized) return [];
+
+  const terms = new Set<string>([normalized]);
+  for (const part of normalized.split(/[\s,/]+/)) {
+    if (part.length > 2) terms.add(part);
+  }
+
+  if (isAdultCatalogQuery(normalized)) {
+    for (const term of ADULT_CATALOG_TERMS) terms.add(term);
+  }
+
+  return [...terms].filter(Boolean);
+}
+
+function productMatchesTerms(product: RemoteProduct, terms: string[]) {
+  if (!terms.length) return true;
+  const haystack = [product.title, product.description, product.category].join(' ').toLowerCase();
+  return terms.some((term) => haystack.includes(term.toLowerCase()));
 }
 
 function imagesFrom(item: any): string[] {
@@ -126,20 +177,30 @@ export async function searchProducts(keyword = '', page = 1): Promise<any> {
   }
   try {
     const products: any[] = [];
+    const seen = new Set<string>();
+    const terms = searchTermsForKeyword(keyword);
+    const remoteKeyword = isAdultCatalogQuery(keyword) ? undefined : keyword || undefined;
     for (let currentPage = Math.max(page, 1); ; currentPage += 1) {
-      const data = await cjRequest('/product/listV2', { page: currentPage, size: PAGE_SIZE, keyWord: keyword || undefined });
-      const pageProducts = unwrapListResponse(data).map((item: any) => mapProduct(item)).filter(Boolean) as any[];
+      const data = await cjRequest('/product/listV2', { page: currentPage, size: PAGE_SIZE, keyWord: remoteKeyword });
+      const pageProducts = unwrapListResponse(data).map((item: any) => mapProduct(item)).filter(Boolean) as RemoteProduct[];
+      const filteredPageProducts = terms.length ? pageProducts.filter((product) => productMatchesTerms(product, terms)) : pageProducts;
+      for (const product of filteredPageProducts) {
+        if (!seen.has(product.cjProductId)) {
+          seen.add(product.cjProductId);
+          products.push(product);
+        }
+      }
       if (!pageProducts.length) break;
-      products.push(...pageProducts);
       if (pageProducts.length < PAGE_SIZE) break;
       if (currentPage - page + 1 > 20) break;
     }
-    return products;
+    return products.length ? products : filterMockCatalog(keyword);
   } catch (err) {
     logger.warn('[cj] searchProducts failed, falling back to mock catalog', err);
     return filterMockCatalog(keyword);
   }
 }
+
 
 export async function getProductDetail(productId: string): Promise<any> {
   if (!configured()) return MOCK_CATALOG.find((p) => p.cjProductId === productId) ?? null;
@@ -150,7 +211,7 @@ export async function getProductDetail(productId: string): Promise<any> {
     const variants = unwrapVariantResponse(variantsResponse);
     return mapProduct({ ...detail, variants }, variants);
   } catch (err) {
-    logger.error('[cj] getProductDetail(' + productId + ') failed', err);
+    logger.error('[cj] getProductDetail(' + productId + ' ) failed', err);
     return null;
   }
 }
