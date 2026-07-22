@@ -36,7 +36,7 @@ async function main() {
   console.log('Seed complete.');
   console.log('  Admin login: admin@elitexshop.com / AdminPass123');
   console.log('  Run `npm run dev` on the backend, then POST /api/products/admin/sync (as admin)');
-  console.log('  to populate the catalog from the bundled AliExpress mock feed.');
+  console.log('  to populate the catalog from the bundled CJ Dropshipping mock feed.');
 }
 
 main()

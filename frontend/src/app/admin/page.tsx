@@ -193,7 +193,7 @@ function ProductSync() {
       toast.success(res.data.message);
       queryClient.invalidateQueries({ queryKey: ['admin-products'] });
     } catch {
-      toast.error('Sync failed. Check your CJ API key in .env.');
+      toast.error('Sync failed. Check your CJ API key in backend/.env.');
     } finally {
       setSyncing(false);
     }
