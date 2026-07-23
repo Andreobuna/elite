@@ -1,5 +1,5 @@
 import express from "express";
-impor cors, { CorsOptions } from "cors";
+import cors, { CorsOptions } from "cors";
 import helmet from "helmet";
 import morgan from "morgan";
 import cookieParser from "cookie-parser";
@@ -150,4 +150,4 @@ app.use((err: any, req: any, res: any, next: any) => {
 app.use(notFoundHandler);
 app.use(errorHandler);
 
-export default app;t
+export default app;
