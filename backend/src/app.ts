@@ -21,6 +21,7 @@ import notificationsRoutes from "./routes/notifications.routes";
 
 const app = express();
 
+app.set('trust proxy', 1);
 const corsOptions: CorsOptions = {
   origin: (origin, callback) => {
     if (!origin || env.clientUrls.includes(origin)) {
