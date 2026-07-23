@@ -178,11 +178,16 @@ export async function searchProducts(keyword = '', page = 1): Promise<any> {
   try {
     const products: any[] = [];
     const seen = new Set<string>();
+    console.log("CJ search started");
+console.log("Configured:", configured());
+console.log("Keyword:", keyword);
     const terms = searchTermsForKeyword(keyword);
     const remoteKeyword = isAdultCatalogQuery(keyword) ? undefined : keyword || undefined;
     for (let currentPage = Math.max(page, 1); ; currentPage += 1) {
       const data = await cjRequest('/product/listV2', { page: currentPage, size: PAGE_SIZE, keyWord: remoteKeyword });
+      console.log("CJ API Response:", JSON.stringify(data, null, 2));
       const pageProducts = unwrapListResponse(data).map((item: any) => mapProduct(item)).filter(Boolean) as RemoteProduct[];
+      
       const filteredPageProducts = terms.length ? pageProducts.filter((product) => productMatchesTerms(product, terms)) : pageProducts;
       for (const product of filteredPageProducts) {
         if (!seen.has(product.cjProductId)) {
@@ -195,7 +200,6 @@ export async function searchProducts(keyword = '', page = 1): Promise<any> {
       if (currentPage - page + 1 > 20) break;
     }
     return products.length ? products : filterMockCatalog(keyword);
-      return products.length ? products : filterMockCatalog(keyword);
   } catch (err: any) {
     console.error("=========== CJ API ERROR ===========");
     console.error(err?.response?.data || err);
