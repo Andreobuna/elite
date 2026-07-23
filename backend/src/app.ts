@@ -41,44 +41,6 @@ app.use(cookieParser());
 app.use(morgan(env.nodeEnv === "production" ? "combined" : "dev"));
 app.use(generalLimiter);
 
-app.get("/api/health", async (req, res) => {
-  try {
-    await prisma.$queryRawUnsafe("SELECT 1");
-    res.json({
-      status: "ok",
-      service: "elite-x-shop-api",
-      database: "ok",
-  status: "ok",
-  cjConfigured: Boolean(env.cj.apiKey),
-  apiKeyLoaded: Boolean(env.cj.apiKey),
-  apiKeyLength: env.cj.apiKey.length,
-});
-    });
-  } catch (error) {
-    const message = error instanceof Error ? error.message : String(error);
-    if (env.nodeEnv !== "production") {
-      console.error("[health] database check failed:", message);
-    }
-
-    if (isDatabaseUnavailable(error)) {
-      return res.json({
-        status: "ok",
-        service: "elite-x-shop-api",
-        database: "fallback",
-        cjConfigured: Boolean(env.cj.apiKey && env.cj.apiSecret),
-        error: env.nodeEnv !== "production" ? message : undefined,
-      });
-    }
-
-    res.status(503).json({
-      status: "degraded",
-      service: "elite-x-shop-api",
-      database: "down",
-      cjConfigured: Boolean(env.cj.apiKey && env.cj.apiSecret),
-      error: env.nodeEnv !== "production" ? message : "unavailable",
-    });
-  }
-});
 
 app.use("/api/products", (req, res, next) => {
   if (req.method !== "GET") return next();
