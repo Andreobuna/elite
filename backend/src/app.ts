@@ -48,7 +48,6 @@ app.get("/api/health", async (req, res) => {
       status: "ok",
       service: "elite-x-shop-api",
       database: "ok",
-    res.json({
   status: "ok",
   cjConfigured: Boolean(env.cj.apiKey),
   apiKeyLoaded: Boolean(env.cj.apiKey),
