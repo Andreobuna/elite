@@ -48,7 +48,12 @@ app.get("/api/health", async (req, res) => {
       status: "ok",
       service: "elite-x-shop-api",
       database: "ok",
-      cjConfigured: Boolean(env.cj.apiKey),
+    res.json({
+  status: "ok",
+  cjConfigured: Boolean(env.cj.apiKey),
+  apiKeyLoaded: Boolean(env.cj.apiKey),
+  apiKeyLength: env.cj.apiKey.length,
+});
     });
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error);
