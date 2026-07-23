@@ -1,5 +1,5 @@
 import express from "express";
-import cors, { CorsOptions } from "cors";
+impor cors, { CorsOptions } from "cors";
 import helmet from "helmet";
 import morgan from "morgan";
 import cookieParser from "cookie-parser";
@@ -48,7 +48,7 @@ app.get("/api/health", async (req, res) => {
       status: "ok",
       service: "elite-x-shop-api",
       database: "ok",
-      cjConfigured: Boolean(env.cj.apiKey && env.cj.apiSecret),
+      cjConfigured: Boolean(env.cj.apiKey),
     });
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error);
@@ -145,4 +145,4 @@ app.use((err: any, req: any, res: any, next: any) => {
 app.use(notFoundHandler);
 app.use(errorHandler);
 
-export default app;
+export default app;t
