@@ -195,11 +195,16 @@ export async function searchProducts(keyword = '', page = 1): Promise<any> {
       if (currentPage - page + 1 > 20) break;
     }
     return products.length ? products : filterMockCatalog(keyword);
-  } catch (err) {
-    logger.warn('[cj] searchProducts failed, falling back to mock catalog', err);
-    return filterMockCatalog(keyword);
+      return products.length ? products : filterMockCatalog(keyword);
+  } catch (err: any) {
+    console.error("=========== CJ API ERROR ===========");
+    console.error(err?.response?.data || err);
+    console.error("====================================");
+
+    throw err;
   }
 }
+
 
 
 export async function getProductDetail(productId: string): Promise<any> {
