@@ -46,6 +46,8 @@ function buildImages(title: string, category: string, accent: string, seedIndex:
 }
 
 export function buildMockCatalog(): RemoteProduct[] {
+  return [];
+}
   const catalog: RemoteProduct[] = [];
   let index = 1001;
 
