@@ -46,45 +46,5 @@ function buildImages(title: string, category: string, accent: string, seedIndex:
 }
 
 export function buildMockCatalog(): RemoteProduct[] {
-  return [];
-}
-  const catalog: RemoteProduct[] = [];
-  let index = 1001;
-
-  for (let seedIndex = 0; seedIndex < SEEDS.length; seedIndex += 1) {
-    const seed = SEEDS[seedIndex];
-    for (let variantIndex = 0; variantIndex < 90; variantIndex += 1) {
-      const type = pick(TYPES, seedIndex * 11 + variantIndex);
-      const finish = pick(FINISHES, seedIndex * 5 + variantIndex);
-      const material = pick(MATERIALS, seedIndex + variantIndex * 2);
-      const highlight = pick(HIGHLIGHTS, seedIndex * 3 + variantIndex);
-      const title = `${seed.name} ${type} ${finish}`;
-      const identifier = `CJ-MOCK-${String(index).padStart(5, '0')}`;
-      const stock = seed.stock + variantIndex * 4 + seedIndex * 3;
-      const price = Math.round((seed.price + seedIndex * 160 + variantIndex * 175) * 100) / 100;
-      const ratingAverage = Math.min(5, Math.max(4, Math.round((seed.rating - (variantIndex % 4) * 0.03 + (seedIndex % 3) * 0.01) * 10) / 10));
-      const ratingCount = seed.ratingCount + variantIndex * 14 + seedIndex * 19;
-      const description = `${seed.detail} ${material} build with a ${highlight} accent and a discreet, travel-friendly profile.`;
-
-      catalog.push({
-        cjProductId: identifier,
-        title,
-        description,
-        images: buildImages(title, seed.category, seed.accent, seedIndex, variantIndex),
-        basePrice: price,
-        currency: 'NGN',
-        stock,
-        category: seed.category,
-        ratingAverage,
-        ratingCount,
-        variants: [
-          { sku: `${identifier}-STD`, name: 'Standard', priceDelta: 0, stock, attributes: { size: 'standard', finish: finish.toLowerCase(), accent: seed.accent.toLowerCase() } },
-          { sku: `${identifier}-DELUXE`, name: 'Deluxe', priceDelta: 1800, stock: Math.max(0, stock - 12), attributes: { size: 'deluxe', finish: 'premium', accent: seed.accent.toLowerCase() } },
-        ],
-      });
-      index += 1;
-    }
-  }
-
-  return catalog;
+    return [];
 }
