@@ -122,6 +122,10 @@ export async function syncFromCjDropshipping(req: Request, res: Response, next: 
   const { keyword = '' } = req.body as { keyword?: string };
   const remoteProducts = await searchProducts(keyword);
 
+  console.log("================================");
+console.log("Products received from CJ:", remoteProducts.length);
+console.log(remoteProducts.slice(0, 3));
+console.log("================================");
   try {
     const log = await prisma.aliExpressSyncLog.create({ data: { status: 'PARTIAL', itemsSynced: 0 } });
     const markupSetting = await prisma.setting.findUnique({ where: { key: 'MARKUP_PERCENT_DEFAULT' } });
