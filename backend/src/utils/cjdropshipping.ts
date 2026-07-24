@@ -160,7 +160,23 @@ function mapProduct(item: any, variantSource?: any): RemoteProduct | null {
   return { cjProductId: id, title, description: String(item.productDescription ?? item.description ?? item.description_url ?? item.productDesc ?? title), images: images.length ? images : ['https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=800'], basePrice: parsePrice(item.totalPrice ?? item.productSellPrice ?? item.sellPrice ?? item.salePrice ?? item.product_min_price ?? item.product_price ?? item.item_offer_site_sale_price ?? item.original_price_cents ?? item.discount_price_cents), currency: String(item.currencyCode ?? item.currency_code ?? item.base_currency_code ?? item.currency ?? 'USD'), stock, category: String(item.categoryName ?? item.category_name ?? item.category ?? item.categoryFirstName ?? 'CJ Dropshipping'), ratingAverage: Number(item.avg_evaluation_rating ?? item.average_star ?? item.ratingAverage ?? item.star ?? 0) || 0, ratingCount: Number(item.evaluation_count ?? item.ratingCount ?? item.order_count ?? item.reviewCount ?? 0) || 0, variants: mapVariants(item, id, variantSource ?? defaultVariant) };
 }
 
-function unwrapListResponse(raw: any) { const data = raw?.data ?? raw?.result ?? raw; const content = data?.content ?? data; return arrayFrom(content?.productList, content?.list, data?.productList, data?.list, data); }
+function unwrapListResponse(raw: any) {
+    const data = raw?.data ?? raw;
+
+    if (Array.isArray(data?.content)) {
+        return data.content;
+    }
+
+    if (Array.isArray(data?.list)) {
+        return data.list;
+    }
+
+    if (Array.isArray(data)) {
+        return data;
+    }
+
+    return [];
+}
 function unwrapDetailResponse(raw: any) { const data = raw?.data ?? raw?.result ?? raw; return data?.content ?? data?.product ?? data; }
 function unwrapVariantResponse(raw: any) { const data = raw?.data ?? raw?.result ?? raw; return arrayFrom(data?.list, data?.variants, data?.content, data); }
 
@@ -187,12 +203,15 @@ console.log("Keyword:", keyword);
       const data = await cjRequest('/product/listV2', { page: currentPage, size: PAGE_SIZE, keyWord: remoteKeyword });
       console.log("CJ API Response:", JSON.stringify(data, null, 2));
       const pageProducts = unwrapListResponse(data).map((item: any) => mapProduct(item)).filter(Boolean) as RemoteProduct[];
+      console.log("Raw products:", unwrapListResponse(data).length);
+console.log("Mapped products:", pageProducts.length);
       
       const filteredPageProducts = terms.length ? pageProducts.filter((product) => productMatchesTerms(product, terms)) : pageProducts;
       for (const product of filteredPageProducts) {
         if (!seen.has(product.cjProductId)) {
           seen.add(product.cjProductId);
           products.push(product);
+          console.log("Products collected:", products.length);
         }
       }
       if (!pageProducts.length) break;
@@ -200,6 +219,7 @@ console.log("Keyword:", keyword);
       if (currentPage - page + 1 > 20) break;
     }
     return products.length ? products : filterMockCatalog(keyword);
+    console.log("Returning", products.length, "products");
   } catch (err: any) {
     console.error("=========== CJ API ERROR ===========");
     console.error(err?.response?.data || err);
