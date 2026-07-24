@@ -120,8 +120,11 @@ export async function listCategories(req: Request, res: Response, next: NextFunc
 // credentials are configured yet) and upserts them with markup applied.
 export async function syncFromCjDropshipping(req: Request, res: Response, next: NextFunction) {
   const { keyword = '' } = req.body as { keyword?: string };
+
   const remoteProducts = await searchProducts(keyword);
 
+console.log("Fetched", remoteProducts.length, "products")
+;
   console.log("================================");
 console.log("Products received from CJ:", remoteProducts.length);
 console.log(remoteProducts.slice(0, 3));
@@ -132,7 +135,8 @@ console.log("================================");
     const markupPercent = markupSetting ? parseFloat(markupSetting.value) : env.defaultMarkupPercent;
 
     let synced = 0;
-    for (const rp of remoteProducts) {
+for (const rp of remoteProducts) {
+  console.log("Syncing:", rp.title);
       const sellingPrice = applyMarkup(rp.basePrice, markupPercent);
 
       let category = await prisma.category.findUnique({ where: { name: rp.category } });
@@ -144,6 +148,7 @@ console.log("================================");
 
       const cjProductId = rp.cjProductId;
       const slug = slugify(rp.title) + '-' + cjProductId.slice(-4);
+console.log("Before upsert");
 
       const product = await prisma.product.upsert({
         where: { aliexpressId: cjProductId },
@@ -172,6 +177,7 @@ console.log("================================");
             })),
           },
         },
+        
         create: {
           aliexpressId: cjProductId,
           title: rp.title,
@@ -196,6 +202,7 @@ console.log("================================");
           },
         },
       });
+      console.log("After upsert:", rp.title);
       synced += 1;
       void product;
     }
@@ -214,6 +221,7 @@ console.log("================================");
     const markupSetting = fallbackSettings().find((setting) => setting.key === 'MARKUP_PERCENT_DEFAULT');
     const markupPercent = markupSetting ? parseFloat(markupSetting.value) : fallbackMarkupPercent();
     const stored = fallbackStoreCatalog(remoteProducts, markupPercent);
+console.log("Finished sync");
 
     res.json({
       message: `Database unavailable. Imported ${stored.length} product(s) into the local catalog cache.`,
