@@ -16,10 +16,10 @@ async function main() {
   const admin = await prisma.user.upsert({
     where: { email: 'admin@elitexshop.com' },
     update: {
-      firstName: 'Elite', 
-      lastName: 'Admin', 
+      firstName: 'Elite',
+      lastName: 'Admin',
       passwordHash: adminPassword,
-      role: 'ADMIN', 
+      role: 'ADMIN',
       isEmailVerified: true,
     },
     create: {
@@ -36,7 +36,7 @@ async function main() {
   console.log('Seed complete.');
   console.log('  Admin login: admin@elitexshop.com / AdminPass123');
   console.log('  Run `npm run dev` on the backend, then POST /api/products/admin/sync (as admin)');
-  console.log('  to populate the catalog from the bundled CJ Dropshipping mock feed.');
+  console.log('  to populate the catalog from CJ Dropshipping.');
 }
 
 main()
@@ -47,5 +47,3 @@ main()
   .finally(async () => {
     await prisma.$disconnect();
   });
-
-

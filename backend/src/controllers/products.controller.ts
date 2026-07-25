@@ -1,18 +1,10 @@
-import { Request, Response, NextFunction } from 'express';
+﻿import { Request, Response, NextFunction } from 'express';
 import { prisma } from '../config/prisma';
 import { AppError } from '../middleware/errorHandler';
 import { searchProducts, getProductDetail, applyMarkup } from '../utils/cjdropshipping';
 import { env } from '../config/env';
 import slugify from '../utils/slugify';
-import {
-  fallbackCatalogCategories,
-  fallbackCatalogProductBySlug,
-  fallbackCatalogProducts,
-  fallbackMarkupPercent,
-  fallbackSettings,
-  fallbackStoreCatalog,
-  isDatabaseUnavailable,
-} from '../utils/dbFallback';
+import { isDatabaseUnavailable } from '../utils/dbFallback';
 
 export async function listProducts(req: Request, res: Response, next: NextFunction) {
   try {
@@ -20,7 +12,10 @@ export async function listProducts(req: Request, res: Response, next: NextFuncti
     const take = Math.min(parseInt(pageSize, 10) || 12, 1000);
     const skip = (Math.max(parseInt(page, 10) || 1, 1) - 1) * take;
 
-    const where: any = { isActive: true };
+    const where: any = {
+      isActive: true,
+      aliexpressId: { not: null },
+    };
     if (category) where.category = { slug: category };
     if (search) where.title = { contains: search, mode: 'insensitive' };
 
@@ -32,7 +27,10 @@ export async function listProducts(req: Request, res: Response, next: NextFuncti
 
     const [products, total] = await Promise.all([
       prisma.product.findMany({
-        where, orderBy, take, skip,
+        where,
+        orderBy,
+        take,
+        skip,
         include: { images: true, category: true },
       }),
       prisma.product.count({ where }),
@@ -44,44 +42,28 @@ export async function listProducts(req: Request, res: Response, next: NextFuncti
       return next(err);
     }
 
-    const { category, search, sort, page = '1', pageSize = '12' } = req.query as Record<string, string>;
+    const { page = '1', pageSize = '12' } = req.query as Record<string, string>;
     const take = Math.min(parseInt(pageSize, 10) || 12, 1000);
-    const skip = (Math.max(parseInt(page, 10) || 1, 1) - 1) * take;
-    const needle = (search || '').trim().toLowerCase();
-
-    let products = fallbackCatalogProducts().filter((product) => {
-      if (!product.isActive) return false;
-      if (category && product.category?.slug !== category) return false;
-      if (needle) {
-        const haystack = [product.title, product.description, product.category?.name ?? '', product.category?.slug ?? '']
-          .join(' ')
-          .toLowerCase();
-        return haystack.includes(needle);
-      }
-      return true;
-    });
-
-    products = products.sort((left, right) => {
-      if (sort === 'price_asc') return Number(left.sellingPrice) - Number(right.sellingPrice);
-      if (sort === 'price_desc') return Number(right.sellingPrice) - Number(left.sellingPrice);
-      if (sort === 'rating') return Number(right.ratingAverage) - Number(left.ratingAverage);
-      return new Date(right.createdAt).getTime() - new Date(left.createdAt).getTime();
-    });
-
-    res.json({ products: products.slice(skip, skip + take), total: products.length, page: Number(page), pageSize: take });
+    const currentPage = Math.max(parseInt(page, 10) || 1, 1);
+    res.json({ products: [], total: 0, page: currentPage, pageSize: take });
   }
 }
 
 export async function getProductBySlug(req: Request, res: Response, next: NextFunction) {
   try {
-    const product = await prisma.product.findUnique({
-      where: { slug: req.params.slug },
+    const product = await prisma.product.findFirst({
+      where: { slug: req.params.slug, isActive: true, aliexpressId: { not: null } },
       include: { images: true, variants: true, category: true, reviews: { include: { user: true } } },
     });
     if (!product) throw new AppError('Product not found.', 404);
 
     const related = await prisma.product.findMany({
-      where: { categoryId: product.categoryId ?? undefined, id: { not: product.id }, isActive: true },
+      where: {
+        categoryId: product.categoryId ?? undefined,
+        id: { not: product.id },
+        isActive: true,
+        aliexpressId: { not: null },
+      },
       take: 4,
       include: { images: true },
     });
@@ -92,51 +74,43 @@ export async function getProductBySlug(req: Request, res: Response, next: NextFu
       return next(err);
     }
 
-    const product = fallbackCatalogProductBySlug(req.params.slug);
-    if (!product) throw new AppError('Product not found.', 404);
-
-    const related = fallbackCatalogProducts()
-      .filter((candidate) => candidate.categoryId === product.categoryId && candidate.slug !== product.slug && candidate.isActive)
-      .slice(0, 4);
-
-    res.json({ product, related });
+    return res.status(503).json({ error: 'Catalog temporarily unavailable.' });
   }
 }
 
 export async function listCategories(req: Request, res: Response, next: NextFunction) {
   try {
-    const categories = await prisma.category.findMany({ orderBy: { name: 'asc' } });
+    const categories = await prisma.category.findMany({
+      where: {
+        products: {
+          some: {
+            isActive: true,
+            aliexpressId: { not: null },
+          },
+        },
+      },
+      orderBy: { name: 'asc' },
+    });
     res.json({ categories });
   } catch (err) {
     if (!isDatabaseUnavailable(err)) {
       return next(err);
     }
-    res.json({ categories: fallbackCatalogCategories() });
+    res.json({ categories: [] });
   }
 }
 
-// --- Admin: CJ Dropshipping sync ---
-// Pulls products from CJ Dropshipping (or the bundled mock catalog, if no API
-// credentials are configured yet) and upserts them with markup applied.
 export async function syncFromCjDropshipping(req: Request, res: Response, next: NextFunction) {
   const { keyword = '' } = req.body as { keyword?: string };
-
   const remoteProducts = await searchProducts(keyword);
 
-console.log("Fetched", remoteProducts.length, "products")
-;
-  console.log("================================");
-console.log("Products received from CJ:", remoteProducts.length);
-console.log(remoteProducts.slice(0, 3));
-console.log("================================");
   try {
     const log = await prisma.aliExpressSyncLog.create({ data: { status: 'PARTIAL', itemsSynced: 0 } });
     const markupSetting = await prisma.setting.findUnique({ where: { key: 'MARKUP_PERCENT_DEFAULT' } });
     const markupPercent = markupSetting ? parseFloat(markupSetting.value) : env.defaultMarkupPercent;
 
     let synced = 0;
-for (const rp of remoteProducts) {
-  console.log("Syncing:", rp.title);
+    for (const rp of remoteProducts) {
       const sellingPrice = applyMarkup(rp.basePrice, markupPercent);
 
       let category = await prisma.category.findUnique({ where: { name: rp.category } });
@@ -148,9 +122,8 @@ for (const rp of remoteProducts) {
 
       const cjProductId = rp.cjProductId;
       const slug = slugify(rp.title) + '-' + cjProductId.slice(-4);
-console.log("Before upsert");
 
-      const product = await prisma.product.upsert({
+      await prisma.product.upsert({
         where: { aliexpressId: cjProductId },
         update: {
           title: rp.title,
@@ -177,7 +150,6 @@ console.log("Before upsert");
             })),
           },
         },
-        
         create: {
           aliexpressId: cjProductId,
           title: rp.title,
@@ -202,9 +174,8 @@ console.log("Before upsert");
           },
         },
       });
-      console.log("After upsert:", rp.title);
+
       synced += 1;
-      void product;
     }
 
     await prisma.aliExpressSyncLog.update({
@@ -218,15 +189,9 @@ console.log("Before upsert");
       return next(err);
     }
 
-    const markupSetting = fallbackSettings().find((setting) => setting.key === 'MARKUP_PERCENT_DEFAULT');
-    const markupPercent = markupSetting ? parseFloat(markupSetting.value) : fallbackMarkupPercent();
-    const stored = fallbackStoreCatalog(remoteProducts, markupPercent);
-console.log("Finished sync");
-
-    res.json({
-      message: `Database unavailable. Imported ${stored.length} product(s) into the local catalog cache.`,
-      synced: stored.length,
-      offline: true,
+    return res.status(503).json({
+      error: 'Database unavailable. CJ products were not stored.',
+      synced: 0,
     });
   }
 }
@@ -240,5 +205,3 @@ export async function getProductDetailPreview(req: Request, res: Response, next:
     next(err);
   }
 }
-
-

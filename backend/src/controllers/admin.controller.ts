@@ -10,7 +10,6 @@ import {
   fallbackUsers,
   isDatabaseUnavailable,
 } from '../utils/dbFallback';
-import { mockProducts } from '../utils/catalogFallback';
 
 export async function getDashboardStats(req: AuthedRequest, res: Response, next: NextFunction) {
   try {
@@ -34,8 +33,7 @@ export async function getDashboardStats(req: AuthedRequest, res: Response, next:
       return next(err);
     }
 
-    const products = mockProducts();
-    res.json(fallbackDashboardStats(products.length));
+    res.json(fallbackDashboardStats(0));
   }
 }
 
