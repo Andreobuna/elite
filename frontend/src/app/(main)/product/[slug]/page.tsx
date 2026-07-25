@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useParams } from 'next/navigation';
 import { useQuery } from '@tanstack/react-query';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { Heart, Minus, Plus, ShieldCheck, Truck, ZoomIn } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { api } from '@/lib/api';
@@ -62,7 +62,7 @@ export default function ProductDetailPage() {
 
   if (!data) return null;
   const { product, related } = data;
-  let images = [];
+  const images: string[] = [];
   if (product.images) {
     for (let i = 0; i < product.images.length; i += 1) {
       if (product.images[i] && product.images[i].url) {
@@ -74,10 +74,14 @@ export default function ProductDetailPage() {
     images.push('/product-placeholder.svg');
   }
 
+  const basePrice = Number(product.basePrice ?? product.sellingPrice);
+  const sellingPrice = Number(product.sellingPrice);
+  const hasDiscount = Number.isFinite(basePrice) && basePrice > sellingPrice;
+  const discountPercent = hasDiscount ? Math.round((1 - sellingPrice / basePrice) * 100) : 0;
+
   return (
     <main className="mx-auto max-w-7xl px-6 py-16">
       <div className="grid gap-12 lg:grid-cols-2">
-        {/* Gallery */}
         <div>
           <div
             className="group relative aspect-square cursor-zoom-in overflow-hidden rounded-2xl border border-white/5 bg-graphite"
@@ -94,10 +98,15 @@ export default function ProductDetailPage() {
             <div className="absolute right-4 top-4 flex h-9 w-9 items-center justify-center rounded-full bg-obsidian/60 text-ivory backdrop-blur-md opacity-0 transition-opacity group-hover:opacity-100">
               <ZoomIn size={16} />
             </div>
+            {hasDiscount && (
+              <div className="absolute left-4 top-4 rounded-full bg-emerald-400/90 px-3 py-1 text-xs font-semibold text-obsidian shadow-lg shadow-emerald-500/20">
+                -{discountPercent}%
+              </div>
+            )}
           </div>
           {images.length > 1 && (
-            <div className="mt-4 flex gap-3">
-              {images.map((img: any, i: number) => (
+            <div className="mt-4 flex gap-3 overflow-x-auto">
+              {images.map((img, i) => (
                 <button
                   key={i}
                   onClick={() => setActiveImage(i)}
@@ -110,16 +119,16 @@ export default function ProductDetailPage() {
           )}
         </div>
 
-        {/* Details */}
         <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
           {product.category && <p className="section-label mb-3">{product.category.name}</p>}
           <h1 className="font-display text-3xl font-semibold text-ivory sm:text-4xl">{product.title}</h1>
           <div className="mt-3">
             <StarRating value={Number(product.ratingAverage)} count={product.ratingCount} />
           </div>
-          <p className="mt-6 font-display text-4xl font-bold text-gold">
-            {formatNaira(product.sellingPrice)}
-          </p>
+          <div className="mt-6 flex flex-wrap items-end gap-3">
+            <p className="font-display text-4xl font-bold text-gold">{formatNaira(sellingPrice)}</p>
+            {hasDiscount && <p className="pb-1 text-sm text-slate line-through">{formatNaira(basePrice)}</p>}
+          </div>
           <p className="mt-2 text-sm text-slate">{product.stock > 0 ? `In stock - ${product.stock} available` : 'Out of stock'}</p>
 
           <p className="mt-6 leading-relaxed text-slate-light">{product.description}</p>
@@ -160,7 +169,6 @@ export default function ProductDetailPage() {
         </motion.div>
       </div>
 
-      {/* Reviews */}
       {product.reviews?.length > 0 && (
         <section className="mt-20">
           <h2 className="mb-6 font-display text-2xl font-semibold text-ivory">Customer Reviews</h2>
@@ -179,7 +187,6 @@ export default function ProductDetailPage() {
         </section>
       )}
 
-      {/* Related */}
       {related?.length > 0 && (
         <section className="mt-20">
           <h2 className="mb-6 font-display text-2xl font-semibold text-ivory">You May Also Like</h2>
@@ -191,5 +198,3 @@ export default function ProductDetailPage() {
     </main>
   );
 }
-
-

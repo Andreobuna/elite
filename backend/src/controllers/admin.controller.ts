@@ -11,6 +11,8 @@ import {
   isDatabaseUnavailable,
 } from '../utils/dbFallback';
 
+const MANUAL_PRODUCT_PREFIX = 'MANUAL-';
+
 export async function getDashboardStats(req: AuthedRequest, res: Response, next: NextFunction) {
   try {
     const [totalRevenue, totalOrders, totalCustomers, totalProducts, recentOrders] = await Promise.all([
@@ -58,10 +60,13 @@ export async function updateMarkup(req: AuthedRequest, res: Response, next: Next
       create: { key: 'MARKUP_PERCENT_DEFAULT', value: String(markupPercent) },
     });
 
-    // Recompute selling prices for all products using the new default markup
-    // (products with a custom per-product markup are left untouched).
+    // Recompute selling prices for CJ-synced products only.
     const products = await prisma.product.findMany();
     for (const p of products) {
+      if (p.aliexpressId?.startsWith(MANUAL_PRODUCT_PREFIX)) {
+        continue;
+      }
+
       const sellingPrice = applyMarkup(Number(p.basePrice), markupPercent);
       await prisma.product.update({ where: { id: p.id }, data: { markupPercent, sellingPrice } });
     }
@@ -70,7 +75,7 @@ export async function updateMarkup(req: AuthedRequest, res: Response, next: Next
       data: { userId: req.user!.sub, action: 'UPDATE_MARKUP', metadata: { markupPercent } },
     });
 
-    res.json({ setting, message: `Markup updated to ${markupPercent}% and applied to ${products.length} products.` });
+    res.json({ setting, message: `Markup updated to ${markupPercent}% and applied to CJ-synced products.` });
   } catch (err) {
     if (!isDatabaseUnavailable(err)) {
       return next(err);

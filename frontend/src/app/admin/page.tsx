@@ -1,11 +1,11 @@
-'use client';
+﻿'use client';
 
 import { useState } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   LayoutGrid, Package, ShoppingCart, Users, Settings as SettingsIcon,
-  RefreshCw, DollarSign, TrendingUp, Percent, ScrollText, CheckCircle2,
+  RefreshCw, DollarSign, TrendingUp, Percent, ScrollText, CheckCircle2, PlusCircle,
 } from 'lucide-react';
 import { AreaChart, Area, ResponsiveContainer, XAxis, YAxis, Tooltip, CartesianGrid } from 'recharts';
 import toast from 'react-hot-toast';
@@ -14,12 +14,8 @@ import Logo from '@/components/Logo';
 
 function resolveProductImage(product: { images?: { url?: string }[] }) {
   let image = '/product-placeholder.svg';
-  if (product.images) {
-    if (product.images[0]) {
-      if (product.images[0].url) {
-        image = product.images[0].url;
-      }
-    }
+  if (product.images && product.images[0] && product.images[0].url) {
+    image = product.images[0].url;
   }
   return image;
 }
@@ -185,8 +181,16 @@ function Overview() {
 function ProductSync() {
   const [keyword, setKeyword] = useState('');
   const [syncing, setSyncing] = useState(false);
+  const [creating, setCreating] = useState(false);
   const [lastSyncCount, setLastSyncCount] = useState<number | null>(null);
   const [categoryFilter, setCategoryFilter] = useState('all');
+  const [name, setName] = useState('');
+  const [price, setPrice] = useState('');
+  const [stock, setStock] = useState('1');
+  const [discountPercent, setDiscountPercent] = useState('0');
+  const [description, setDescription] = useState('');
+  const [imageDataUrl, setImageDataUrl] = useState('');
+  const [imageUrl, setImageUrl] = useState('');
   const queryClient = useQueryClient();
 
   const { data: products, isLoading } = useQuery({
@@ -211,13 +215,84 @@ function ProductSync() {
     }
   }
 
+  async function handleCreateManualProduct() {
+    setCreating(true);
+    try {
+      const payload = {
+        name,
+        price: Number(price),
+        stock: Number(stock),
+        description,
+        discountPercent: Number(discountPercent || 0),
+        imageDataUrl: imageDataUrl || undefined,
+        imageUrl: imageDataUrl ? undefined : imageUrl || undefined,
+      };
+      const res = await api.post('/admin/products', payload);
+      toast.success(res.data.message || 'Manual product created.');
+      setName('');
+      setPrice('');
+      setStock('1');
+      setDiscountPercent('0');
+      setDescription('');
+      setImageDataUrl('');
+      setImageUrl('');
+      queryClient.invalidateQueries({ queryKey: ['admin-products'] });
+    } catch (err: any) {
+      toast.error(err.response?.data?.error || 'Failed to create manual product.');
+    } finally {
+      setCreating(false);
+    }
+  }
+
+  function onFileChange(file?: File | null) {
+    if (!file) {
+      setImageDataUrl('');
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = () => {
+      setImageDataUrl(String(reader.result ?? ''));
+    };
+    reader.readAsDataURL(file);
+  }
+
   return (
     <div>
       <h1 className="font-display text-2xl font-semibold text-ivory">Product Synchronization</h1>
       <p className="mt-1 text-sm text-slate">
-        Pull products from CJ Dropshipping. Without live API credentials configured on the server, this uses the
-        bundled mock catalog so you can test the full pipeline end-to-end. Last sync: {lastSyncCount === null ? 'Not run yet' : lastSyncCount + ' products'}
+        Create a manual sexual wellness product or pull items from CJ Dropshipping. Manual items are shown first in the sexual wellness catalog.
       </p>
+
+      <div className="mt-6 rounded-2xl border border-gold/15 bg-charcoal/50 p-6">
+        <div className="flex items-center gap-2 text-gold">
+          <PlusCircle size={18} />
+          <h2 className="font-display text-lg">Create Manual Product</h2>
+        </div>
+        <div className="mt-4 grid gap-4 md:grid-cols-2">
+          <input value={name} onChange={(e) => setName(e.target.value)} placeholder="Product name" className="input-elite" />
+          <input value={price} onChange={(e) => setPrice(e.target.value)} placeholder="Price" type="number" step="0.01" min="0" className="input-elite" />
+          <input value={stock} onChange={(e) => setStock(e.target.value)} placeholder="Amount available" type="number" min="0" className="input-elite" />
+          <input value={discountPercent} onChange={(e) => setDiscountPercent(e.target.value)} placeholder="Discount % (optional)" type="number" step="0.1" min="0" max="100" className="input-elite" />
+          <input value={imageUrl} onChange={(e) => setImageUrl(e.target.value)} placeholder="Image URL (optional fallback)" className="input-elite md:col-span-2" />
+          <input type="file" accept="image/*" onChange={(e) => onFileChange(e.target.files?.[0] ?? null)} className="input-elite md:col-span-2" />
+          <textarea value={description} onChange={(e) => setDescription(e.target.value)} placeholder="Write-up about the product" rows={4} className="input-elite md:col-span-2" />
+        </div>
+
+        <div className="mt-4 flex items-center gap-3">
+          <button onClick={handleCreateManualProduct} disabled={creating} className="btn-gold disabled:opacity-60">
+            {creating ? 'Creating…' : 'Create Product'}
+          </button>
+          <p className="text-xs text-slate">The product will be saved in Sexual Wellness and surfaced before synced items.</p>
+        </div>
+
+        {(imageDataUrl || imageUrl) && (
+          <div className="mt-4 overflow-hidden rounded-2xl border border-white/5 bg-obsidian/60 p-3">
+            <p className="mb-2 text-xs uppercase tracking-wide text-slate">Image Preview</p>
+            <img src={imageDataUrl || imageUrl} alt="Preview" className="h-48 w-full rounded-xl object-cover" />
+          </div>
+        )}
+      </div>
 
       <div className="mt-6 flex flex-col gap-3 rounded-2xl border border-gold/15 bg-charcoal/50 p-6 sm:flex-row">
         <input
@@ -227,7 +302,7 @@ function ProductSync() {
           className="input-elite flex-1"
         />
         <button onClick={runSync} disabled={syncing} className="btn-gold shrink-0 disabled:opacity-60">
-          <RefreshCw size={16} className={syncing ? 'animate-spin' : ''} /> {syncing ? 'Syncingâ€¦' : 'Run Sync'}
+          <RefreshCw size={16} className={syncing ? 'animate-spin' : ''} /> {syncing ? 'Syncing…' : 'Run Sync'}
         </button>
       </div>
 
@@ -248,7 +323,10 @@ function ProductSync() {
                   <tr key={p.id} className="border-t border-white/5">
                     <td className="flex items-center gap-3 py-3 text-ivory">
                       <img src={resolveProductImage(p)} className={'h-9 w-9 rounded-lg object-cover'} alt={p.title} />
-                      <span className="line-clamp-1 max-w-[220px]">{p.title}</span>
+                      <div>
+                        <span className="line-clamp-1 max-w-[220px]">{p.title}</span>
+                        {String(p.aliexpressId ?? '').startsWith('MANUAL-') && <span className="mt-1 block text-[11px] uppercase tracking-wide text-gold">Manual</span>}
+                      </div>
                     </td>
                     <td className="py-3 text-slate">${Number(p.basePrice).toFixed(2)}</td>
                     <td className="py-3 text-slate">{Number(p.markupPercent)}%</td>
@@ -291,7 +369,7 @@ function OrdersPanel() {
             <div key={o.id} className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-white/5 bg-charcoal/50 p-5">
               <div>
                 <p className="font-display text-ivory">#{o.orderNumber}</p>
-                <p className="text-xs text-slate">{o.user.firstName} {o.user.lastName} Â· ${Number(o.grandTotal).toFixed(2)}</p>
+                <p className="text-xs text-slate">{o.user.firstName} {o.user.lastName} · ${Number(o.grandTotal).toFixed(2)}</p>
               </div>
               <select
                 defaultValue={o.status}
@@ -340,7 +418,7 @@ function CustomersPanel() {
                 <tr key={u.id} className="border-t border-white/5">
                   <td className="py-3 text-ivory">{u.firstName} {u.lastName}</td>
                   <td className="py-3 text-slate">{u.email}</td>
-                  <td className="py-3">{u.isEmailVerified ? <CheckCircle2 size={16} className="text-emerald-300" /> : <span className="text-slate">â€”</span>}</td>
+                  <td className="py-3">{u.isEmailVerified ? <CheckCircle2 size={16} className="text-emerald-300" /> : <span className="text-slate">—</span>}</td>
                   <td className="py-3 text-gold">{u.role}</td>
                   <td className="py-3">
                     <button onClick={() => toggleRole(u.id, u.role)} className="text-xs text-gold underline underline-offset-2">
@@ -386,7 +464,7 @@ function SettingsPanel() {
 
       <div className="mt-6 rounded-2xl border border-gold/15 bg-charcoal/50 p-6">
         <div className="flex items-center gap-2 text-gold"><Percent size={18} /><h2 className="font-display text-lg">Default Markup Percentage</h2></div>
-        <p className="mt-2 text-sm text-slate">Applied automatically to every product synced from CJ Dropshipping. Existing products are recalculated immediately when you save.</p>
+        <p className="mt-2 text-sm text-slate">Applied automatically to every product synced from CJ Dropshipping. Manual products keep their own prices.</p>
         <div className="mt-4 flex items-center gap-3">
           <input
             type="number" step="0.1" min="0" value={markup}
@@ -395,7 +473,7 @@ function SettingsPanel() {
           />
           <span className="text-slate">%</span>
           <button onClick={saveMarkup} disabled={saving} className="btn-gold disabled:opacity-60">
-            {saving ? 'Savingâ€¦' : 'Save Markup'}
+            {saving ? 'Saving…' : 'Save Markup'}
           </button>
         </div>
       </div>
@@ -406,7 +484,7 @@ function SettingsPanel() {
           {(logs ?? []).map((log: any) => (
             <div key={log.id} className="flex items-center justify-between rounded-lg bg-white/[0.02] px-4 py-2.5 text-sm">
               <span className="text-ivory">{log.action}</span>
-              <span className="text-xs text-slate">{log.user ? `${log.user.firstName} ${log.user.lastName}` : 'System'} Â· {new Date(log.createdAt).toLocaleString()}</span>
+              <span className="text-xs text-slate">{log.user ? `${log.user.firstName} ${log.user.lastName}` : 'System'} · {new Date(log.createdAt).toLocaleString()}</span>
             </div>
           ))}
         </div>
@@ -436,7 +514,3 @@ function SettingsPanel() {
     </div>
   );
 }
-
-
-
-

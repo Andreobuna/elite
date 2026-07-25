@@ -1,7 +1,6 @@
 ﻿'use client';
 
 import Link from 'next/link';
-import Image from 'next/image';
 import { motion } from 'framer-motion';
 import { useQuery } from '@tanstack/react-query';
 import { ArrowRight, ShieldCheck, Truck, RefreshCcw, Sparkles } from 'lucide-react';
@@ -34,20 +33,17 @@ function useProducts(params: Record<string, string> = {}) {
 }
 
 export default function HomePage() {
-  const trendingToys = useProducts({ category: 'sexual-wellness', search: 'toy', sort: 'newest', pageSize: '8' });
+  const trendingToys = useProducts({ category: 'sexual-wellness', sort: 'newest', pageSize: '8' });
   const featuredWellness = useProducts({ category: 'sexual-wellness', sort: 'rating', pageSize: '4' });
 
   return (
     <main>
       <section className='relative overflow-hidden px-6 pb-24 pt-20 sm:min-h-[88vh] sm:pt-28'>
         <div className='absolute inset-0'>
-          <Image
+          <img
             src='/shop.png'
             alt=''
-            fill
-            priority
-            sizes='100vw'
-            className='object-cover object-center opacity-25 blur-[1px] scale-105'
+            className='h-full w-full object-cover object-center opacity-25 blur-[1px] scale-105'
           />
           <div className='absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(17,17,17,0.25),rgba(7,10,12,0.86)_65%)]' />
           <div className='absolute inset-0 bg-gradient-to-b from-obsidian/50 via-obsidian/55 to-obsidian' />
@@ -63,8 +59,7 @@ export default function HomePage() {
             for <span className='text-shimmer'>adult wellness</span>
           </motion.h1>
           <motion.p initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, delay: 0.25 }} className='mt-6 max-w-xl text-base text-slate-light sm:text-lg'>
-            Browse a curated adult wellness catalog with sex toys, accessories, lubricants, and discreet delivery in naira.
-            
+            Browse a curated adult wellness catalog with sexual wellness essentials, accessories, lubricants, and discreet delivery in naira.
           </motion.p>
           <motion.div initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, delay: 0.4 }} className='mt-10 flex flex-col gap-4 sm:flex-row'>
             <Link href='/shop' className='btn-gold'>
@@ -115,13 +110,13 @@ export default function HomePage() {
         <div className='mb-10 flex items-end justify-between'>
           <div>
             <p className='section-label mb-3'>Trending New Arrivals</p>
-            <h2 className='font-display text-3xl font-semibold text-ivory sm:text-4xl'>Toy-oriented products from the curated catalog</h2>
+            <h2 className='font-display text-3xl font-semibold text-ivory sm:text-4xl'>Sexual wellness products from the curated catalog</h2>
           </div>
           <Link href='/adult-wellness' className='hidden items-center gap-1 text-sm text-gold hover:text-gold-light sm:flex'>
             Open guide <ArrowRight size={14} />
           </Link>
         </div>
-        <ProductGrid query={trendingToys} emptyHint='The catalog has toy-oriented sexual wellness products, but no exact pocket-pussy label was found.' />
+        <ProductGrid query={trendingToys} emptyHint='Create a manual sexual wellness product in the admin dashboard to surface it first.' />
       </section>
 
       <section className='mx-auto max-w-7xl px-6 py-10 pb-24'>
@@ -165,5 +160,3 @@ function ProductGrid({ query, columns = 4, emptyHint }: { query: ReturnType<type
     </div>
   );
 }
-
-

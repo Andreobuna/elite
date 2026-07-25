@@ -20,14 +20,14 @@ export interface ProductCardData {
 
 export default function ProductCard({ product, index = 0 }: { product: ProductCardData; index?: number }) {
   let image = '/product-placeholder.svg';
-  if (product.images) {
-    if (product.images[0]) {
-      if (product.images[0].url) {
-        image = product.images[0].url;
-      }
-    }
+  if (product.images && product.images[0] && product.images[0].url) {
+    image = product.images[0].url;
   }
+
   const price = Number(product.sellingPrice);
+  const basePrice = product.basePrice !== undefined ? Number(product.basePrice) : null;
+  const hasDiscount = basePrice !== null && Number.isFinite(basePrice) && basePrice > price;
+  const discountPercent = hasDiscount ? Math.round((1 - price / basePrice!) * 100) : 0;
 
   return (
     <motion.div
@@ -47,6 +47,11 @@ export default function ProductCard({ product, index = 0 }: { product: ProductCa
             sizes="(max-width: 768px) 50vw, 25vw"
             className="object-cover transition-transform duration-700 ease-out group-hover:scale-110"
           />
+          {hasDiscount && (
+            <div className="absolute left-3 top-3 rounded-full bg-emerald-400/90 px-2.5 py-1 text-[11px] font-semibold text-obsidian shadow-lg shadow-emerald-500/20">
+              -{discountPercent}%
+            </div>
+          )}
           <button
             aria-label="Add to wishlist"
             onClick={(e) => e.preventDefault()}
@@ -58,13 +63,12 @@ export default function ProductCard({ product, index = 0 }: { product: ProductCa
         <div className="mt-4 space-y-2 px-1 pb-1">
           <h3 className="line-clamp-2 font-body text-sm font-medium text-ivory">{product.title}</h3>
           <StarRating value={Number(product.ratingAverage)} count={product.ratingCount} />
-          <div className="flex items-baseline gap-2">
+          <div className="flex flex-wrap items-baseline gap-2">
             <span className="font-display text-lg font-semibold text-gold">{formatNaira(price)}</span>
+            {hasDiscount && <span className="text-xs text-slate line-through">{formatNaira(basePrice!)}</span>}
           </div>
         </div>
       </Link>
     </motion.div>
   );
 }
-
-
