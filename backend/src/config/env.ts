@@ -47,7 +47,7 @@ export const env = {
     refreshExpiresIn: req('JWT_REFRESH_EXPIRES_IN', '30d'),
   },
   cj: { apiKey: cjApiKey, apiSecret: cjApiSecret, accessToken: cjAccessToken, refreshToken: cjRefreshToken, baseUrl: cjBaseUrl, country: cjCountry, language: cjLanguage },
-  defaultMarkupPercent: parseFloat(req('DEFAULT_MARKUP_PERCENT', '10')),
+  defaultMarkupPercent: parseFloat(req('DEFAULT_MARKUP_PERCENT', '400')),
   cloudinary: { cloudName: req('CLOUDINARY_CLOUD_NAME'), apiKey: req('CLOUDINARY_API_KEY'), apiSecret: req('CLOUDINARY_API_SECRET') },
   stripe: { secretKey: req('STRIPE_SECRET_KEY'), webhookSecret: req('STRIPE_WEBHOOK_SECRET') },
   paypal: { clientId: req('PAYPAL_CLIENT_ID'), clientSecret: req('PAYPAL_CLIENT_SECRET'), mode: req('PAYPAL_MODE', 'sandbox') },

@@ -1,7 +1,12 @@
 import { Response, NextFunction } from 'express';
 import { prisma } from '../config/prisma';
 import { AppError } from '../middleware/errorHandler';
+import { getDisplayedCjPrice } from '../utils/productPricing';
 import { AuthedRequest } from '../middleware/auth';
+
+function applyVisiblePricing(product: any) {
+  return String(product.aliexpressId ?? '').startsWith('MANUAL-') ? product : { ...product, sellingPrice: getDisplayedCjPrice(product.basePrice, product.aliexpressId), markupPercent: 400 };
+}
 
 async function getOrCreateCart(userId: string) {
   let cart = await prisma.cart.findUnique({ where: { userId } });
@@ -16,7 +21,7 @@ export async function getCart(req: AuthedRequest, res: Response, next: NextFunct
       where: { cartId: cart.id },
       include: { product: { include: { images: true } }, variant: true },
     });
-    res.json({ items });
+    res.json({ items: items.map((item) => ({ ...item, product: applyVisiblePricing(item.product) })) });
   } catch (err) {
     next(err);
   }

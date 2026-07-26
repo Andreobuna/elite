@@ -59,7 +59,7 @@ export default function HomePage() {
             for <span className='text-shimmer'>adult wellness</span>
           </motion.h1>
           <motion.p initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, delay: 0.25 }} className='mt-6 max-w-xl text-base text-slate-light sm:text-lg'>
-            Browse a curated adult wellness catalog with sexual wellness essentials, accessories, lubricants, and discreet delivery in naira.
+            Explore a refined elite adult wellness collection with sexual wellness essentials, accessories, lubricants, and discreet delivery in naira.
           </motion.p>
           <motion.div initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, delay: 0.4 }} className='mt-10 flex flex-col gap-4 sm:flex-row'>
             <Link href='/shop' className='btn-gold'>
@@ -110,13 +110,13 @@ export default function HomePage() {
         <div className='mb-10 flex items-end justify-between'>
           <div>
             <p className='section-label mb-3'>Trending New Arrivals</p>
-            <h2 className='font-display text-3xl font-semibold text-ivory sm:text-4xl'>Sexual wellness products from the curated catalog</h2>
+            <h2 className='font-display text-3xl font-semibold text-ivory sm:text-4xl'>Elite adult wellness products worth discovering</h2>
           </div>
           <Link href='/adult-wellness' className='hidden items-center gap-1 text-sm text-gold hover:text-gold-light sm:flex'>
             Open guide <ArrowRight size={14} />
           </Link>
         </div>
-        <ProductGrid query={trendingToys} emptyHint='Create a manual sexual wellness product in the admin dashboard to surface it first.' />
+        <ProductGrid query={trendingToys} emptyHint='Create a manual elite product in the admin dashboard to surface it first.' />
       </section>
 
       <section className='mx-auto max-w-7xl px-6 py-10 pb-24'>
@@ -126,7 +126,7 @@ export default function HomePage() {
             <h2 className='font-display text-3xl font-semibold text-ivory sm:text-4xl'>Top rated items for the full store experience</h2>
           </div>
         </div>
-        <ProductGrid query={featuredWellness} columns={4} emptyHint='The catalog is loaded with curated adult wellness products.' />
+        <ProductGrid query={featuredWellness} columns={4} emptyHint='The collection is loaded with curated elite adult wellness products.' />
       </section>
     </main>
   );

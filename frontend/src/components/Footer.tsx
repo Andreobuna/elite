@@ -60,7 +60,7 @@ export default function Footer() {
         </div>
         <div className="mt-14 flex flex-col items-center justify-between gap-4 border-t border-white/5 pt-8 text-xs text-slate md:flex-row">
           <p>© {new Date().getFullYear()} Elite X Shop. All rights reserved.</p>
-          <p>Secured checkout · Verified catalog · Transparent markup</p>
+          <p>Secured checkout · Verified collection · Transparent markup</p>
         </div>
       </div>
     </footer>

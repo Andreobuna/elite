@@ -15,9 +15,9 @@ const categories = [
 ];
 
 const trust = [
-  { icon: ShieldCheck, title: 'Verified listings', text: 'Pulled from the live catalog and shown with real pricing.' },
+  { icon: ShieldCheck, title: 'Verified listings', text: 'Pulled from the latest collection and shown with real pricing.' },
   { icon: Truck, title: 'Discreet delivery', text: 'Plain packaging and tracked fulfillment.' },
-  { icon: Sparkles, title: 'Toy-first curation', text: 'Manual sexual wellness listings are surfaced before synced items.' },
+  { icon: Sparkles, title: 'Toy-first curation', text: 'Manual elite listings are surfaced before synced items.' },
 ];
 
 function useProducts(params: Record<string, string> = {}) {
@@ -35,15 +35,15 @@ export default function AdultWellnessPage() {
     <main className="mx-auto max-w-7xl px-6 py-16">
       <section className="grid gap-10 lg:grid-cols-[1.2fr_0.8fr] lg:items-center">
         <div>
-          <p className="section-label mb-4">Adult Wellness Catalog</p>
-          <h1 className="font-display text-5xl font-semibold leading-tight text-ivory sm:text-6xl">Sexual wellness first, with discreet shopping built in.</h1>
+          <p className="section-label mb-4">Adult Wellness Collection</p>
+          <h1 className="font-display text-5xl font-semibold leading-tight text-ivory sm:text-6xl">Elite adult wellness first, with discreet shopping built in.</h1>
           <p className="mt-6 max-w-2xl text-base text-slate-light sm:text-lg">
-            This landing page is tuned for customers looking for vibrators, personal stimulators, couples toys, lubes, and other adult products.
-            Manual products created in the admin dashboard appear before CJ-synced items in the sexual wellness catalog.
+            Explore a refined selection of vibrators, personal stimulators, couples toys, lubes, and other adult essentials.
+            Manual products created in the admin dashboard appear before CJ-synced items in the collection.
           </p>
           <div className="mt-8 flex flex-wrap gap-3">
             <Link href="/shop?category=sexual-wellness" className="btn-gold">
-              Shop Sexual Wellness <ArrowRight size={16} />
+              Explore Collection <ArrowRight size={16} />
             </Link>
             <Link href="/shop" className="btn-ghost">
               Browse All Categories
@@ -70,10 +70,10 @@ export default function AdultWellnessPage() {
         <div className="mb-8 flex items-end justify-between gap-4">
           <div>
             <p className="section-label mb-3">Trending New Arrivals</p>
-            <h2 className="font-display text-3xl font-semibold text-ivory sm:text-4xl">Sexual wellness picks from the live catalog</h2>
+            <h2 className="font-display text-3xl font-semibold text-ivory sm:text-4xl">Elite wellness picks from the latest drops</h2>
           </div>
           <Link href="/shop?category=sexual-wellness&sort=newest" className="hidden items-center gap-1 text-sm text-gold hover:text-gold-light sm:flex">
-            Open catalog <ArrowRight size={14} />
+            Explore collection <ArrowRight size={14} />
           </Link>
         </div>
 
@@ -83,7 +83,7 @@ export default function AdultWellnessPage() {
           </div>
         ) : !trending.data || trending.data.length === 0 ? (
           <div className="rounded-2xl border border-dashed border-white/10 py-16 text-center text-slate">
-            No sexual wellness products surfaced yet.
+            No elite adult wellness products surfaced yet.
           </div>
         ) : (
           <div className="grid grid-cols-2 gap-5 sm:grid-cols-3 lg:grid-cols-4">
@@ -113,9 +113,9 @@ export default function AdultWellnessPage() {
       </section>
 
       <section className="mt-20 rounded-3xl border border-white/5 bg-charcoal/40 p-8">
-        <h2 className="font-display text-3xl font-semibold text-ivory">A note on the catalog</h2>
+        <h2 className="font-display text-3xl font-semibold text-ivory">A note on the collection</h2>
         <p className="mt-4 max-w-3xl text-slate-light">
-          Manual sexual wellness items created in the admin panel appear first in the sexual wellness catalog, followed by CJ-synced products.
+          Manual elite items created in the admin panel appear first in the collection, followed by CJ-synced products.
         </p>
       </section>
     </main>

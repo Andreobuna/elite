@@ -2,6 +2,7 @@
 import { prisma } from '../config/prisma';
 import { AppError } from '../middleware/errorHandler';
 import { searchProducts, getProductDetail, applyMarkup } from '../utils/cjdropshipping';
+import { getDisplayedCjPrice } from '../utils/productPricing';
 import { env } from '../config/env';
 import slugify from '../utils/slugify';
 import { isDatabaseUnavailable } from '../utils/dbFallback';
@@ -41,6 +42,11 @@ function buildManualProductId() {
   return `${MANUAL_PRODUCT_PREFIX}${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`;
 }
 
+function applyVisiblePricing(product: any) {
+  if (isManualProduct(product)) return product;
+  return { ...product, sellingPrice: getDisplayedCjPrice(product.basePrice, product.aliexpressId), markupPercent: 400 };
+}
+
 export async function listProducts(req: Request, res: Response, next: NextFunction) {
   try {
     const { category, search, sort, page = '1', pageSize = '12' } = req.query as Record<string, string>;
@@ -69,7 +75,7 @@ export async function listProducts(req: Request, res: Response, next: NextFuncti
       include: { images: true, category: true },
     });
 
-    const merged = mergeCatalog(products);
+    const merged = mergeCatalog(products).map(applyVisiblePricing);
     const paged = merged.slice(skip, skip + take);
 
     res.json({ products: paged, total: merged.length, page: currentPage, pageSize: take });
@@ -103,7 +109,7 @@ export async function getProductBySlug(req: Request, res: Response, next: NextFu
       include: { images: true },
     });
 
-    res.json({ product, related });
+    res.json({ product: applyVisiblePricing(product), related: related.map(applyVisiblePricing) });
   } catch (err) {
     if (!isDatabaseUnavailable(err)) {
       return next(err);

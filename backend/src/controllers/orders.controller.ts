@@ -4,6 +4,11 @@ import { AppError } from '../middleware/errorHandler';
 import { AuthedRequest } from '../middleware/auth';
 import { sendOrderConfirmationEmail, sendShippingUpdateEmail } from '../utils/mailer';
 import { createPaymentIntent } from '../utils/payments';
+import { getDisplayedCjPrice } from '../utils/productPricing';
+
+function applyVisiblePricing(product: any) {
+  return String(product.aliexpressId ?? '').startsWith('MANUAL-') ? product : { ...product, sellingPrice: getDisplayedCjPrice(product.basePrice, product.aliexpressId), markupPercent: 400 };
+}
 
 export async function createOrder(req: AuthedRequest, res: Response, next: NextFunction) {
   try {
@@ -19,8 +24,10 @@ export async function createOrder(req: AuthedRequest, res: Response, next: NextF
     const address = await prisma.address.findFirst({ where: { id: addressId, userId } });
     if (!address) throw new AppError('Shipping address not found.', 404);
 
+    const visibleItems = cart.items.map((item) => ({ ...item, product: applyVisiblePricing(item.product) }));
+
     let subtotal = 0;
-    for (const item of cart.items) {
+    for (const item of visibleItems) {
       const unit = Number(item.product.sellingPrice) + Number(item.variant?.priceDelta ?? 0);
       subtotal += unit * item.quantity;
     }
@@ -52,7 +59,7 @@ export async function createOrder(req: AuthedRequest, res: Response, next: NextF
         grandTotal,
         couponId: coupon?.id,
         items: {
-          create: cart.items.map((item: (typeof cart.items)[number]) => ({
+          create: visibleItems.map((item: (typeof visibleItems)[number]) => ({
             productId: item.productId,
             variantId: item.variantId ?? undefined,
             titleSnapshot: item.product.title,

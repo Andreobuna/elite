@@ -2,6 +2,11 @@ import { Response, NextFunction } from 'express';
 import { prisma } from '../config/prisma';
 import { AuthedRequest } from '../middleware/auth';
 import { AppError } from '../middleware/errorHandler';
+import { getDisplayedCjPrice } from '../utils/productPricing';
+
+function applyVisiblePricing(product: any) {
+  return String(product.aliexpressId ?? '').startsWith('MANUAL-') ? product : { ...product, sellingPrice: getDisplayedCjPrice(product.basePrice, product.aliexpressId), markupPercent: 400 };
+}
 
 export async function listWishlist(req: AuthedRequest, res: Response, next: NextFunction) {
   try {
@@ -10,7 +15,7 @@ export async function listWishlist(req: AuthedRequest, res: Response, next: Next
       include: { product: { include: { images: true } } },
       orderBy: { addedAt: 'desc' },
     });
-    res.json({ items });
+    res.json({ items: items.map((item) => ({ ...item, product: applyVisiblePricing(item.product) })) });
   } catch (err) {
     next(err);
   }
