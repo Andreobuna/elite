@@ -1,11 +1,11 @@
-import { Response, NextFunction } from 'express';
+﻿import { Response, NextFunction } from 'express';
 import { prisma } from '../config/prisma';
 import { AppError } from '../middleware/errorHandler';
-import { getDisplayedCjPrice } from '../utils/productPricing';
+import { normalizeVisibleCjProduct } from '../utils/productPricing';
 import { AuthedRequest } from '../middleware/auth';
 
 function applyVisiblePricing(product: any) {
-  return String(product.aliexpressId ?? '').startsWith('MANUAL-') ? product : { ...product, sellingPrice: getDisplayedCjPrice(product.basePrice, product.aliexpressId), markupPercent: 400 };
+  return normalizeVisibleCjProduct(product);
 }
 
 async function getOrCreateCart(userId: string) {
@@ -70,3 +70,4 @@ export async function removeCartItem(req: AuthedRequest, res: Response, next: Ne
     next(err);
   }
 }
+

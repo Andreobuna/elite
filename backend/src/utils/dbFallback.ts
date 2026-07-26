@@ -61,7 +61,10 @@ export function fallbackUsers() {
 }
 
 export function fallbackSettings() {
-  return [{ key: 'MARKUP_PERCENT_DEFAULT', value: String(fallbackMarkupPercent()) }];
+  return [
+    { key: 'MARKUP_PERCENT_DEFAULT', value: String(fallbackMarkupPercent()) },
+    { key: 'CJ_USD_TO_NGN_RATE', value: String(env.cj.usdToNgnRate) },
+  ];
 }
 
 export function fallbackCoupons() {
@@ -219,3 +222,6 @@ export function fallbackUpsertCatalogProduct(input: {
     updatedAt: new Date(),
   };
 }
+
+
+

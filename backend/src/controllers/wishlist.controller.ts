@@ -1,11 +1,11 @@
-import { Response, NextFunction } from 'express';
+﻿import { Response, NextFunction } from 'express';
 import { prisma } from '../config/prisma';
 import { AuthedRequest } from '../middleware/auth';
 import { AppError } from '../middleware/errorHandler';
-import { getDisplayedCjPrice } from '../utils/productPricing';
+import { normalizeVisibleCjProduct } from '../utils/productPricing';
 
 function applyVisiblePricing(product: any) {
-  return String(product.aliexpressId ?? '').startsWith('MANUAL-') ? product : { ...product, sellingPrice: getDisplayedCjPrice(product.basePrice, product.aliexpressId), markupPercent: 400 };
+  return normalizeVisibleCjProduct(product);
 }
 
 export async function listWishlist(req: AuthedRequest, res: Response, next: NextFunction) {
@@ -48,3 +48,4 @@ export async function removeFromWishlist(req: AuthedRequest, res: Response, next
     next(err);
   }
 }
+

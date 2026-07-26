@@ -1,13 +1,13 @@
-import { Response, NextFunction } from 'express';
+﻿import { Response, NextFunction } from 'express';
 import { prisma } from '../config/prisma';
 import { AppError } from '../middleware/errorHandler';
 import { AuthedRequest } from '../middleware/auth';
 import { sendOrderConfirmationEmail, sendShippingUpdateEmail } from '../utils/mailer';
 import { createPaymentIntent } from '../utils/payments';
-import { getDisplayedCjPrice } from '../utils/productPricing';
+import { normalizeVisibleCjProduct } from '../utils/productPricing';
 
 function applyVisiblePricing(product: any) {
-  return String(product.aliexpressId ?? '').startsWith('MANUAL-') ? product : { ...product, sellingPrice: getDisplayedCjPrice(product.basePrice, product.aliexpressId), markupPercent: 400 };
+  return normalizeVisibleCjProduct(product);
 }
 
 export async function createOrder(req: AuthedRequest, res: Response, next: NextFunction) {
@@ -72,7 +72,7 @@ export async function createOrder(req: AuthedRequest, res: Response, next: NextF
     });
 
     // Create a payment record + provider session/intent (stubbed until real
-    // API keys are supplied — see src/utils/payments.ts).
+    // API keys are supplied â€” see src/utils/payments.ts).
     const paymentSession = await createPaymentIntent(paymentProvider, grandTotal, order.orderNumber);
     const payment = await prisma.payment.create({
       data: {
@@ -137,3 +137,4 @@ export async function updateOrderStatus(req: AuthedRequest, res: Response, next:
     next(err);
   }
 }
+

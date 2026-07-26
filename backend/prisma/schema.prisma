@@ -1,4 +1,4 @@
-// Elite X Shop — Database Schema
+// Elite X Shop â€” Database Schema
 // PostgreSQL + Prisma ORM
 
 generator client {
@@ -140,7 +140,8 @@ model Product {
   title             String
   slug              String    @unique
   description       String
-  basePrice         Decimal   @db.Decimal(10, 2) // cost price synced from AliExpress
+  basePrice         Decimal   @db.Decimal(10, 2) // displayed local cost price for CJ items
+  sourceBasePrice   Decimal?  @db.Decimal(10, 2) // original CJ price before NGN conversion
   markupPercent     Decimal   @db.Decimal(5, 2) @default(10.00) // per-product override
   sellingPrice      Decimal   @db.Decimal(10, 2) // computed = basePrice * (1 + markupPercent/100)
   currency          String    @default("USD")
@@ -398,3 +399,6 @@ model AuditLog {
 
   @@index([userId])
 }
+
+
+

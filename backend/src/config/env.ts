@@ -46,7 +46,7 @@ export const env = {
     accessExpiresIn: req('JWT_ACCESS_EXPIRES_IN', '15m'),
     refreshExpiresIn: req('JWT_REFRESH_EXPIRES_IN', '30d'),
   },
-  cj: { apiKey: cjApiKey, apiSecret: cjApiSecret, accessToken: cjAccessToken, refreshToken: cjRefreshToken, baseUrl: cjBaseUrl, country: cjCountry, language: cjLanguage },
+  cj: { apiKey: cjApiKey, apiSecret: cjApiSecret, accessToken: cjAccessToken, refreshToken: cjRefreshToken, baseUrl: cjBaseUrl, country: cjCountry, language: cjLanguage, usdToNgnRate: parseFloat(req('CJ_USD_TO_NGN_RATE', '1600')) },
   defaultMarkupPercent: parseFloat(req('DEFAULT_MARKUP_PERCENT', '400')),
   cloudinary: { cloudName: req('CLOUDINARY_CLOUD_NAME'), apiKey: req('CLOUDINARY_API_KEY'), apiSecret: req('CLOUDINARY_API_SECRET') },
   stripe: { secretKey: req('STRIPE_SECRET_KEY'), webhookSecret: req('STRIPE_WEBHOOK_SECRET') },
@@ -56,3 +56,4 @@ export const env = {
   smtp: { host: req('SMTP_HOST'), port: parseInt(req('SMTP_PORT', '587'), 10), user: req('SMTP_USER'), pass: req('SMTP_PASS'), from: req('EMAIL_FROM', 'Elite X Shop <no-reply@elitexshop.com>') },
   rateLimit: { windowMs: parseInt(req('RATE_LIMIT_WINDOW_MS', '900000'), 10), max: parseInt(req('RATE_LIMIT_MAX', '200'), 10) },
 };
+

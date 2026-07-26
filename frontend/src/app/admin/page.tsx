@@ -1,6 +1,6 @@
-﻿'use client';
+'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
@@ -10,6 +10,7 @@ import {
 import { AreaChart, Area, ResponsiveContainer, XAxis, YAxis, Tooltip, CartesianGrid } from 'recharts';
 import toast from 'react-hot-toast';
 import { api } from '@/lib/api';
+import { formatNaira } from '@/lib/currency';
 import Logo from '@/components/Logo';
 
 function resolveProductImage(product: { images?: { url?: string }[] }) {
@@ -123,7 +124,7 @@ function Overview() {
       ) : (
         <>
           <div className="mt-6 grid grid-cols-2 gap-4 lg:grid-cols-4">
-            <StatCard icon={DollarSign} label="Total Revenue" value={`$${Number(data?.totalRevenue ?? 0).toFixed(2)}`} accent />
+            <StatCard icon={DollarSign} label="Total Revenue" value={formatNaira(Number(data?.totalRevenue ?? 0))} accent />
             <StatCard icon={ShoppingCart} label="Total Orders" value={String(data?.totalOrders ?? 0)} />
             <StatCard icon={Users} label="Customers" value={String(data?.totalCustomers ?? 0)} />
             <StatCard icon={Package} label="Products" value={String(data?.totalProducts ?? 0)} />
@@ -165,7 +166,7 @@ function Overview() {
                       <td className="py-3 text-ivory">#{o.orderNumber}</td>
                       <td className="py-3 text-slate">{o.user.firstName} {o.user.lastName}</td>
                       <td className="py-3 text-gold">{o.status}</td>
-                      <td className="py-3 text-right text-ivory">${Number(o.grandTotal).toFixed(2)}</td>
+                      <td className="py-3 text-right text-ivory">{formatNaira(Number(o.grandTotal))}</td>
                     </tr>
                   ))}
                 </tbody>
@@ -191,6 +192,15 @@ function ProductSync() {
   const [description, setDescription] = useState('');
   const [imageDataUrl, setImageDataUrl] = useState('');
   const [imageUrl, setImageUrl] = useState('');
+  const [editingProductId, setEditingProductId] = useState('');
+  const [editName, setEditName] = useState('');
+  const [editPrice, setEditPrice] = useState('');
+  const [editStock, setEditStock] = useState('1');
+  const [editDiscountPercent, setEditDiscountPercent] = useState('0');
+  const [editDescription, setEditDescription] = useState('');
+  const [editImageDataUrl, setEditImageDataUrl] = useState('');
+  const [editImageUrl, setEditImageUrl] = useState('');
+  const [editing, setEditing] = useState(false);
   const queryClient = useQueryClient();
 
   const { data: products, isLoading } = useQuery({
@@ -257,6 +267,60 @@ function ProductSync() {
     reader.readAsDataURL(file);
   }
 
+  function onEditFileChange(file?: File | null) {
+    if (!file) {
+      setEditImageDataUrl('');
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = () => {
+      setEditImageDataUrl(String(reader.result ?? ''));
+    };
+    reader.readAsDataURL(file);
+  }
+
+  const manualProducts = (products ?? []).filter((p: any) => String(p.aliexpressId ?? '').startsWith('MANUAL-'));
+
+  function startEditingProduct(product: any) {
+    setEditingProductId(product.id);
+    setEditName(product.title ?? '');
+    setEditPrice(String(product.basePrice ?? ''));
+    setEditStock(String(product.stock ?? '1'));
+    setEditDiscountPercent(product.basePrice > product.sellingPrice ? String(Math.round((1 - Number(product.sellingPrice) / Number(product.basePrice)) * 100)) : '0');
+    setEditDescription(product.description ?? '');
+    setEditImageDataUrl('');
+    setEditImageUrl(product.images?.[0]?.url ?? '');
+  }
+
+  async function handleUpdateManualProduct() {
+    if (!editingProductId) {
+      toast.error('Select a manual product to edit first.');
+      return;
+    }
+
+    setEditing(true);
+    try {
+      const payload = {
+        name: editName,
+        price: Number(editPrice),
+        stock: Number(editStock),
+        description: editDescription,
+        discountPercent: Number(editDiscountPercent || 0),
+        imageDataUrl: editImageDataUrl || undefined,
+        imageUrl: editImageDataUrl ? undefined : editImageUrl || undefined,
+      };
+      const res = await api.patch(`/admin/products/${editingProductId}`, payload);
+      toast.success(res.data.message || 'Manual product updated.');
+      queryClient.invalidateQueries({ queryKey: ['admin-products'] });
+      queryClient.invalidateQueries({ queryKey: ['admin-dashboard'] });
+    } catch (err: any) {
+      toast.error(err.response?.data?.error || 'Failed to update manual product.');
+    } finally {
+      setEditing(false);
+    }
+  }
+
   return (
     <div>
       <h1 className="font-display text-2xl font-semibold text-ivory">Product Synchronization</h1>
@@ -281,7 +345,7 @@ function ProductSync() {
 
         <div className="mt-4 flex items-center gap-3">
           <button onClick={handleCreateManualProduct} disabled={creating} className="btn-gold disabled:opacity-60">
-            {creating ? 'Creating…' : 'Create Product'}
+            {creating ? 'CreatingÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¦' : 'Create Product'}
           </button>
           <p className="text-xs text-slate">The product will be saved in Sexual Wellness and surfaced before synced items.</p>
         </div>
@@ -294,6 +358,52 @@ function ProductSync() {
         )}
       </div>
 
+      <div className="mt-6 rounded-2xl border border-gold/15 bg-charcoal/50 p-6">
+        <div className="flex items-center gap-2 text-gold">
+          <SettingsIcon size={18} />
+          <h2 className="font-display text-lg">Edit Manual Product</h2>
+        </div>
+        <p className="mt-2 text-sm text-slate">Pick one of the manually created products below, update the details, and save the changes.</p>
+
+        <div className="mt-4 grid gap-4 md:grid-cols-2">
+          <select
+            value={editingProductId}
+            onChange={(e) => {
+              const product = manualProducts.find((item: any) => item.id === e.target.value);
+              setEditingProductId(e.target.value);
+              if (product) startEditingProduct(product);
+            }}
+            className="input-elite md:col-span-2"
+          >
+            <option value="">Select a manual product</option>
+            {manualProducts.map((product: any) => (
+              <option key={product.id} value={product.id}>{product.title}</option>
+            ))}
+          </select>
+          <input value={editName} onChange={(e) => setEditName(e.target.value)} placeholder="Product name" className="input-elite" />
+          <input value={editPrice} onChange={(e) => setEditPrice(e.target.value)} placeholder="Price" type="number" step="0.01" min="0" className="input-elite" />
+          <input value={editStock} onChange={(e) => setEditStock(e.target.value)} placeholder="Amount available" type="number" min="0" className="input-elite" />
+          <input value={editDiscountPercent} onChange={(e) => setEditDiscountPercent(e.target.value)} placeholder="Discount % (optional)" type="number" step="0.1" min="0" max="100" className="input-elite" />
+          <input value={editImageUrl} onChange={(e) => setEditImageUrl(e.target.value)} placeholder="Image URL (optional fallback)" className="input-elite md:col-span-2" />
+          <input type="file" accept="image/*" onChange={(e) => onEditFileChange(e.target.files?.[0] ?? null)} className="input-elite md:col-span-2" />
+          <textarea value={editDescription} onChange={(e) => setEditDescription(e.target.value)} placeholder="Write-up about the product" rows={4} className="input-elite md:col-span-2" />
+        </div>
+
+        <div className="mt-4 flex items-center gap-3">
+          <button onClick={handleUpdateManualProduct} disabled={editing || !editingProductId} className="btn-gold disabled:opacity-60">
+            {editing ? 'SavingÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¦' : 'Save Changes'}
+          </button>
+          <p className="text-xs text-slate">Only products created manually can be updated here.</p>
+        </div>
+
+        {(editImageDataUrl || editImageUrl) && (
+          <div className="mt-4 overflow-hidden rounded-2xl border border-white/5 bg-obsidian/60 p-3">
+            <p className="mb-2 text-xs uppercase tracking-wide text-slate">Image Preview</p>
+            <img src={editImageDataUrl || editImageUrl} alt="Edit preview" className="h-48 w-full rounded-xl object-cover" />
+          </div>
+        )}
+      </div>
+
       <div className="mt-6 flex flex-col gap-3 rounded-2xl border border-gold/15 bg-charcoal/50 p-6 sm:flex-row">
         <input
           value={keyword}
@@ -302,7 +412,7 @@ function ProductSync() {
           className="input-elite flex-1"
         />
         <button onClick={runSync} disabled={syncing} className="btn-gold shrink-0 disabled:opacity-60">
-          <RefreshCw size={16} className={syncing ? 'animate-spin' : ''} /> {syncing ? 'Syncing…' : 'Run Sync'}
+          <RefreshCw size={16} className={syncing ? 'animate-spin' : ''} /> {syncing ? 'SyncingÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¦' : 'Run Sync'}
         </button>
       </div>
 
@@ -328,9 +438,9 @@ function ProductSync() {
                         {String(p.aliexpressId ?? '').startsWith('MANUAL-') && <span className="mt-1 block text-[11px] uppercase tracking-wide text-gold">Manual</span>}
                       </div>
                     </td>
-                    <td className="py-3 text-slate">${Number(p.basePrice).toFixed(2)}</td>
+                    <td className="py-3 text-slate">{formatNaira(Number(p.basePrice))}</td>
                     <td className="py-3 text-slate">{Number(p.markupPercent)}%</td>
-                    <td className="py-3 text-gold">${Number(p.sellingPrice).toFixed(2)}</td>
+                    <td className="py-3 text-gold">{formatNaira(Number(p.sellingPrice))}</td>
                     <td className="py-3 text-slate">{p.stock}</td>
                   </tr>
                 ))}
@@ -369,7 +479,7 @@ function OrdersPanel() {
             <div key={o.id} className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-white/5 bg-charcoal/50 p-5">
               <div>
                 <p className="font-display text-ivory">#{o.orderNumber}</p>
-                <p className="text-xs text-slate">{o.user.firstName} {o.user.lastName} · ${Number(o.grandTotal).toFixed(2)}</p>
+                <p className="text-xs text-slate">{o.user.firstName} {o.user.lastName} ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â· {formatNaira(Number(o.grandTotal))}</p>
               </div>
               <select
                 defaultValue={o.status}
@@ -418,7 +528,7 @@ function CustomersPanel() {
                 <tr key={u.id} className="border-t border-white/5">
                   <td className="py-3 text-ivory">{u.firstName} {u.lastName}</td>
                   <td className="py-3 text-slate">{u.email}</td>
-                  <td className="py-3">{u.isEmailVerified ? <CheckCircle2 size={16} className="text-emerald-300" /> : <span className="text-slate">—</span>}</td>
+                  <td className="py-3">{u.isEmailVerified ? <CheckCircle2 size={16} className="text-emerald-300" /> : <span className="text-slate">ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚Â</span>}</td>
                   <td className="py-3 text-gold">{u.role}</td>
                   <td className="py-3">
                     <button onClick={() => toggleRole(u.id, u.role)} className="text-xs text-gold underline underline-offset-2">
@@ -437,6 +547,8 @@ function CustomersPanel() {
 
 function SettingsPanel() {
   const [markup, setMarkup] = useState('10');
+    const [cjRate, setCjRate] = useState('1600');
+    const [savingRate, setSavingRate] = useState(false);
   const [saving, setSaving] = useState(false);
   const queryClient = useQueryClient();
 
@@ -446,6 +558,20 @@ function SettingsPanel() {
   });
 
   async function saveMarkup() {
+
+    async function saveCjRate() {
+      setSavingRate(true);
+      try {
+        const res = await api.post('/admin/settings/cj-rate', { cjUsdToNgnRate: parseFloat(cjRate) });
+        toast.success(res.data.message);
+        queryClient.invalidateQueries({ queryKey: ['admin-settings'] });
+        queryClient.invalidateQueries({ queryKey: ['admin-products'] });
+      } catch {
+        toast.error('Failed to update CJ rate.');
+      } finally {
+        setSavingRate(false);
+      }
+    }
     setSaving(true);
     try {
       const res = await api.post('/admin/settings/markup', { markupPercent: parseFloat(markup) });
@@ -473,7 +599,25 @@ function SettingsPanel() {
           />
           <span className="text-slate">%</span>
           <button onClick={saveMarkup} disabled={saving} className="btn-gold disabled:opacity-60">
-            {saving ? 'Saving…' : 'Save Markup'}
+            {saving ? 'SavingÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¦' : 'Save Markup'}
+          </button>
+        </div>
+      </div>
+
+      <div className="mt-8 rounded-2xl border border-gold/15 bg-charcoal/50 p-6">
+        <div className="flex items-center gap-2 text-gold"><DollarSign size={18} /><h2 className="font-display text-lg">CJ USD to NGN Rate</h2></div>
+        <p className="mt-2 text-sm text-slate">Used when importing CJ products. Change this if the exchange rate moves.</p>
+        <div className="mt-4 flex flex-col gap-3 sm:flex-row sm:items-center">
+          <input
+            type="number"
+            step="0.01"
+            min="0"
+            value={cjRate}
+            onChange={(e) => setCjRate(e.target.value)}
+            className="input-elite w-full sm:w-56"
+          />
+          <button onClick={saveCjRate} disabled={savingRate} className="btn-gold disabled:opacity-60">
+            {savingRate ? 'SavingÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¦' : 'Save Rate'}
           </button>
         </div>
       </div>
@@ -484,7 +628,7 @@ function SettingsPanel() {
           {(logs ?? []).map((log: any) => (
             <div key={log.id} className="flex items-center justify-between rounded-lg bg-white/[0.02] px-4 py-2.5 text-sm">
               <span className="text-ivory">{log.action}</span>
-              <span className="text-xs text-slate">{log.user ? `${log.user.firstName} ${log.user.lastName}` : 'System'} · {new Date(log.createdAt).toLocaleString()}</span>
+              <span className="text-xs text-slate">{log.user ? `${log.user.firstName} ${log.user.lastName}` : 'System'} ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â· {new Date(log.createdAt).toLocaleString()}</span>
             </div>
           ))}
         </div>
@@ -514,3 +658,19 @@ function SettingsPanel() {
     </div>
   );
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

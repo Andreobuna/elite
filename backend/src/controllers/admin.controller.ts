@@ -89,6 +89,31 @@ export async function updateMarkup(req: AuthedRequest, res: Response, next: Next
   }
 }
 
+export async function updateCjUsdToNgnRate(req: AuthedRequest, res: Response, next: NextFunction) {
+  const { cjUsdToNgnRate } = req.body;
+  try {
+    const setting = await prisma.setting.upsert({
+      where: { key: 'CJ_USD_TO_NGN_RATE' },
+      update: { value: String(cjUsdToNgnRate) },
+      create: { key: 'CJ_USD_TO_NGN_RATE', value: String(cjUsdToNgnRate) },
+    });
+
+    await prisma.auditLog.create({
+      data: { userId: req.user!.sub, action: 'UPDATE_CJ_USD_TO_NGN_RATE', metadata: { cjUsdToNgnRate } },
+    });
+
+    res.json({ setting, message: `CJ USD to NGN rate updated to ${cjUsdToNgnRate}.` });
+  } catch (err) {
+    if (!isDatabaseUnavailable(err)) {
+      return next(err);
+    }
+
+    res.json({
+      setting: { key: 'CJ_USD_TO_NGN_RATE', value: String(cjUsdToNgnRate) },
+      message: `CJ USD to NGN rate updated to ${cjUsdToNgnRate} in offline mode.`,
+    });
+  }
+}
 export async function listUsers(req: AuthedRequest, res: Response, next: NextFunction) {
   try {
     const users = await prisma.user.findMany({
@@ -173,3 +198,4 @@ export async function listCoupons(req: AuthedRequest, res: Response, next: NextF
     res.json({ coupons: fallbackCoupons() });
   }
 }
+

@@ -5,6 +5,7 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Heart, X, ShoppingBag } from 'lucide-react';
 import { api } from '@/lib/api';
+import { formatNaira } from '@/lib/currency';
 import StarRating from '@/components/StarRating';
 
 function resolveProductImage(product: { images?: { url?: string }[] }) {
@@ -91,7 +92,7 @@ export default function WishlistPage() {
                     {item.product.title}
                   </Link>
                   <StarRating value={Number(item.product.ratingAverage)} count={item.product.ratingCount} />
-                  <p className="font-display text-gold">${Number(item.product.sellingPrice).toFixed(2)}</p>
+                  <p className="font-display text-gold">{formatNaira(Number(item.product.sellingPrice))}</p>
                   <button onClick={() => moveToCart(item.product.id)} className="btn-ghost mt-2 w-full !py-2 text-xs">
                     <ShoppingBag size={14} /> Move to Cart
                   </button>
@@ -104,4 +105,9 @@ export default function WishlistPage() {
     </main>
   );
 }
+
+
+
+
+
 

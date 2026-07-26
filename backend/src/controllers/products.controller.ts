@@ -1,8 +1,8 @@
-﻿import { Request, Response, NextFunction } from 'express';
+import { Request, Response, NextFunction } from 'express';
 import { prisma } from '../config/prisma';
 import { AppError } from '../middleware/errorHandler';
 import { searchProducts, getProductDetail, applyMarkup } from '../utils/cjdropshipping';
-import { getDisplayedCjPrice } from '../utils/productPricing';
+import { convertCjUsdToNgn, normalizeVisibleCjProduct } from '../utils/productPricing';
 import { env } from '../config/env';
 import slugify from '../utils/slugify';
 import { isDatabaseUnavailable } from '../utils/dbFallback';
@@ -42,9 +42,11 @@ function buildManualProductId() {
   return `${MANUAL_PRODUCT_PREFIX}${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`;
 }
 
+function roundCurrency(value: number) {
+  return Math.round(value * 100) / 100;
+}
 function applyVisiblePricing(product: any) {
-  if (isManualProduct(product)) return product;
-  return { ...product, sellingPrice: getDisplayedCjPrice(product.basePrice, product.aliexpressId), markupPercent: 400 };
+  return normalizeVisibleCjProduct(product);
 }
 
 export async function listProducts(req: Request, res: Response, next: NextFunction) {
@@ -147,11 +149,15 @@ export async function syncFromCjDropshipping(req: Request, res: Response, next: 
   try {
     const log = await prisma.aliExpressSyncLog.create({ data: { status: 'PARTIAL', itemsSynced: 0 } });
     const markupSetting = await prisma.setting.findUnique({ where: { key: 'MARKUP_PERCENT_DEFAULT' } });
+    const rateSetting = await prisma.setting.findUnique({ where: { key: 'CJ_USD_TO_NGN_RATE' } });
     const markupPercent = markupSetting ? parseFloat(markupSetting.value) : env.defaultMarkupPercent;
+    const cjUsdToNgnRate = rateSetting ? parseFloat(rateSetting.value) : env.cj.usdToNgnRate;
 
     let synced = 0;
     for (const rp of remoteProducts) {
-      const sellingPrice = applyMarkup(rp.basePrice, markupPercent);
+      const sourceBasePrice = roundCurrency(rp.basePrice);
+      const basePrice = roundCurrency(sourceBasePrice * cjUsdToNgnRate);
+      const sellingPrice = applyMarkup(basePrice, markupPercent);
 
       let category = await prisma.category.findUnique({ where: { name: rp.category } });
       if (!category) {
@@ -168,7 +174,8 @@ export async function syncFromCjDropshipping(req: Request, res: Response, next: 
         update: {
           title: rp.title,
           description: rp.description,
-          basePrice: rp.basePrice,
+          sourceBasePrice,
+          basePrice,
           markupPercent,
           sellingPrice,
           stock: rp.stock,
@@ -184,7 +191,7 @@ export async function syncFromCjDropshipping(req: Request, res: Response, next: 
             create: rp.variants.map((v: any) => ({
               sku: v.sku,
               name: v.name,
-              priceDelta: v.priceDelta,
+              priceDelta: roundCurrency(Number(v.priceDelta ?? 0) * cjUsdToNgnRate),
               stock: v.stock,
               attributes: v.attributes,
             })),
@@ -195,7 +202,8 @@ export async function syncFromCjDropshipping(req: Request, res: Response, next: 
           title: rp.title,
           slug,
           description: rp.description,
-          basePrice: rp.basePrice,
+          sourceBasePrice,
+          basePrice,
           markupPercent,
           sellingPrice,
           stock: rp.stock,
@@ -207,7 +215,7 @@ export async function syncFromCjDropshipping(req: Request, res: Response, next: 
             create: rp.variants.map((v: any) => ({
               sku: v.sku,
               name: v.name,
-              priceDelta: v.priceDelta,
+              priceDelta: roundCurrency(Number(v.priceDelta ?? 0) * cjUsdToNgnRate),
               stock: v.stock,
               attributes: v.attributes,
             })),
@@ -321,6 +329,7 @@ export async function createManualProduct(req: AuthedRequest, res: Response, nex
         title: name,
         slug: slugify(String(name ?? 'product')),
         description,
+        sourceBasePrice: null,
         basePrice: toNumber(price, 0),
         markupPercent: 0,
         sellingPrice: Math.max(0, Math.round(toNumber(price, 0) * (1 - toNumber(discountPercent, 0) / 100) * 100) / 100),
@@ -337,12 +346,113 @@ export async function createManualProduct(req: AuthedRequest, res: Response, nex
   }
 }
 
+export async function updateManualProduct(req: AuthedRequest, res: Response, next: NextFunction) {
+  const { name, price, stock, description, discountPercent, imageDataUrl, imageUrl } = req.body as {
+    name?: string;
+    price?: string | number;
+    stock?: string | number;
+    description?: string;
+    discountPercent?: string | number;
+    imageDataUrl?: string;
+    imageUrl?: string;
+  };
+
+  try {
+    const existing = await prisma.product.findUnique({ where: { id: req.params.id }, include: { images: true, category: true } });
+    if (!existing) throw new AppError('Product not found.', 404);
+    if (!isManualProduct(existing)) throw new AppError('Only manually created products can be edited here.', 400);
+
+    const title = String(name ?? existing.title).trim();
+    const writeUp = String(description ?? existing.description).trim();
+    const numericPrice = toNumber(price, Number(existing.basePrice));
+    const numericStock = Math.max(0, Math.floor(toNumber(stock, existing.stock)));
+    const numericDiscount = Math.min(100, Math.max(0, toNumber(discountPercent, 0)));
+    const resolvedImage = buildImageUrl(imageDataUrl, imageUrl);
+
+    if (!title) throw new AppError('Product name is required.');
+    if (!writeUp) throw new AppError('Product description is required.');
+    if (!Number.isFinite(numericPrice) || numericPrice <= 0) throw new AppError('Product price must be greater than zero.');
+
+    const basePrice = Math.round(numericPrice * 100) / 100;
+    const sellingPrice = Math.max(0, Math.round(basePrice * (1 - numericDiscount / 100) * 100) / 100);
+    const slug = existing.slug.startsWith('manual-') ? `${slugify(title)}-${existing.aliexpressId?.slice(-6) ?? existing.id.slice(0, 6)}` : existing.slug;
+
+    const product = await prisma.product.update({
+      where: { id: existing.id },
+      data: {
+        title,
+        slug,
+        description: writeUp,
+        basePrice,
+        sellingPrice,
+        stock: numericStock,
+        sourceBasePrice: null,
+        images: resolvedImage
+          ? {
+              deleteMany: {},
+              create: [{ url: resolvedImage, position: 0 }],
+            }
+          : undefined,
+      },
+      include: { images: true, category: true },
+    });
+
+    await prisma.auditLog.create({
+      data: {
+        userId: req.user?.sub,
+        action: 'UPDATE_MANUAL_PRODUCT',
+        entity: 'Product',
+        entityId: product.id,
+        metadata: { title, price: basePrice, sellingPrice, stock: numericStock, discountPercent: numericDiscount },
+      },
+    });
+
+    res.json({ product, message: 'Manual product updated successfully.' });
+  } catch (err) {
+    if (!isDatabaseUnavailable(err)) {
+      return next(err);
+    }
+
+    return res.json({
+      product: {
+        id: req.params.id,
+        aliexpressId: `${MANUAL_PRODUCT_PREFIX}offline`,
+        title: name,
+        slug: slugify(String(name ?? 'product')),
+        description,
+        sourceBasePrice: null,
+        basePrice: toNumber(price, 0),
+        markupPercent: 0,
+        sellingPrice: Math.max(0, Math.round(toNumber(price, 0) * (1 - toNumber(discountPercent, 0) / 100) * 100) / 100),
+        currency: 'NGN',
+        stock: Math.max(0, Math.floor(toNumber(stock, 0))),
+        ratingAverage: 0,
+        ratingCount: 0,
+        categoryId: null,
+        category: { id: 'offline-sexual-wellness', name: 'Sexual Wellness', slug: SEXUAL_WELLNESS_SLUG },
+        images: [{ id: `offline-${Date.now()}-image`, productId: req.params.id, url: imageDataUrl || imageUrl || '', altText: null, position: 0 }],
+      },
+      message: 'Manual product updated in offline mode.',
+    });
+  }
+}
 export async function getProductDetailPreview(req: Request, res: Response, next: NextFunction) {
   try {
     const detail = await getProductDetail(req.params.cjProductId);
     if (!detail) throw new AppError('Product not found on CJ Dropshipping.', 404);
-    res.json({ product: detail });
+    res.json({ product: normalizeVisibleCjProduct(detail) });
   } catch (err) {
     next(err);
   }
 }
+
+
+
+
+
+
+
+
+
+
+
