@@ -150,7 +150,7 @@ export async function syncFromCjDropshipping(req: Request, res: Response, next: 
     const log = await prisma.aliExpressSyncLog.create({ data: { status: 'PARTIAL', itemsSynced: 0 } });
     const markupSetting = await prisma.setting.findUnique({ where: { key: 'MARKUP_PERCENT_DEFAULT' } });
     const rateSetting = await prisma.setting.findUnique({ where: { key: 'CJ_USD_TO_NGN_RATE' } });
-    const markupPercent = markupSetting ? parseFloat(markupSetting.value) : env.defaultMarkupPercent;
+    const markupPercent = 100;
     const cjUsdToNgnRate = rateSetting ? parseFloat(rateSetting.value) : env.cj.usdToNgnRate;
 
     let synced = 0;
