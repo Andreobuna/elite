@@ -155,6 +155,11 @@ export async function syncFromCjDropshipping(req: Request, res: Response, next: 
 
     let synced = 0;
     for (const rp of remoteProducts) {
+      console.log("CJ PRODUCT:", {
+  title: rp.title,
+  basePrice: rp.basePrice,
+  currency: rp.currency,
+});
       const sourceBasePrice = roundCurrency(rp.basePrice);
       const basePrice = roundCurrency(sourceBasePrice * cjUsdToNgnRate);
       const sellingPrice = applyMarkup(basePrice, markupPercent);
