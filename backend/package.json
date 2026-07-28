@@ -8,7 +8,7 @@
   },
   "scripts": {
     "dev": "set APP_PORT=4001&& set CLIENT_URL=http://www.elitexshop.com nodemon --watch src --ext ts,json --ignore logs --ignore dist --ignore node_modules --exec ts-node src/server.ts",
-    "build": "tsc",
+    "build": "prisma generate && tsc",
     "start": "node dist/server.js",
     "prisma:generate": "prisma generate",
     "prisma:migrate": "prisma migrate dev",
