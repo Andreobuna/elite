@@ -51,15 +51,15 @@ export default function HomePage() {
         <AmbientBackground density={22} />
         <div className='relative z-10 mx-auto flex max-w-5xl flex-col items-center text-center'>
           <motion.span initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }} className='section-label mb-6'>
-            <span>Adult Wellness · Verified · Delivered</span>
+            <span>Shop With Class · Verified · Delivered</span>
           </motion.span>
           <motion.h1 initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, delay: 0.1, ease: [0.16, 1, 0.3, 1] }} className='font-display text-5xl font-bold leading-[1.05] text-ivory sm:text-6xl lg:text-7xl'>
-            Discreet shopping
+            Shop with class
             <br />
-            for <span className='text-shimmer'>adult wellness</span>
+            for <span className='text-shimmer'>premium essentials</span>
           </motion.h1>
           <motion.p initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, delay: 0.25 }} className='mt-6 max-w-xl text-base text-slate-light sm:text-lg'>
-            Explore a refined elite adult wellness collection with sexual wellness essentials, accessories, lubricants, and discreet delivery in naira.
+            Explore a refined collection of premium sex toys, clothing, shoes, accessories, and intimate essentials, all with discreet delivery and prices shown in naira.
           </motion.p>
           <motion.div initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, delay: 0.4 }} className='mt-10 flex flex-col gap-4 sm:flex-row'>
             <Link href='/shop' className='btn-gold'>
@@ -110,7 +110,7 @@ export default function HomePage() {
         <div className='mb-10 flex items-end justify-between'>
           <div>
             <p className='section-label mb-3'>Trending New Arrivals</p>
-            <h2 className='font-display text-3xl font-semibold text-ivory sm:text-4xl'>Elite adult wellness products worth discovering</h2>
+            <h2 className='font-display text-3xl font-semibold text-ivory sm:text-4xl'>Elite picks worth discovering</h2>
           </div>
           <Link href='/adult-wellness' className='hidden items-center gap-1 text-sm text-gold hover:text-gold-light sm:flex'>
             Open guide <ArrowRight size={14} />
@@ -122,11 +122,11 @@ export default function HomePage() {
       <section className='mx-auto max-w-7xl px-6 py-10 pb-24'>
         <div className='mb-10 flex items-end justify-between'>
           <div>
-            <p className='section-label mb-3'>Sexual Wellness Essentials</p>
-            <h2 className='font-display text-3xl font-semibold text-ivory sm:text-4xl'>Top rated items for the full store experience</h2>
+            <p className='section-label mb-3'>Curated Essentials</p>
+            <h2 className='font-display text-3xl font-semibold text-ivory sm:text-4xl'>Premium finds for every side of your style</h2>
           </div>
         </div>
-        <ProductGrid query={featuredWellness} columns={4} emptyHint='The collection is loaded with curated elite adult wellness products.' />
+        <ProductGrid query={featuredWellness} columns={4} emptyHint='The collection is loaded with curated premium products across toys, fashion, shoes, and more.' />
       </section>
     </main>
   );

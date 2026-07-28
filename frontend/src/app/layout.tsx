@@ -13,9 +13,9 @@ const inter = Inter({ subsets: ['latin'], variable: '--font-inter', display: 'sw
 const spaceGrotesk = Space_Grotesk({ subsets: ['latin'], variable: '--font-space', display: 'swap' });
 
 export const metadata: Metadata = {
-  title: 'Elite X Shop - Adult Wellness, Curated in One Place',
+  title: 'Elite X Shop - Shop With Class',
   description:
-    'Elite X Shop brings sexual wellness essentials, couples products, massagers, and lubricants into a discreet shopping experience with transparent pricing.',
+    'Elite X Shop offers a refined mix of premium sex toys, clothing, shoes, accessories, and intimate essentials with discreet delivery and transparent pricing in naira.',
 };
 
 const themeScript = `

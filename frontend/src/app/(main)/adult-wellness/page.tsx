@@ -11,7 +11,7 @@ const categories = [
   { name: 'Sexual Wellness', slug: 'sexual-wellness', image: 'https://images.unsplash.com/photo-1588596692308-1f2b7c4c8d89?w=700' },
   { name: 'Massagers', slug: 'massagers', image: 'https://images.unsplash.com/photo-1531746790731-6c087fecd65a?w=700' },
   { name: 'Couples', slug: 'couples', image: 'https://images.unsplash.com/photo-1556228578-0d85b1a8f3f8?w=700' },
-  { name: 'Lubricants', slug: 'lubricants', image: 'https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?w=700' },
+  { name: 'coming soon', slug: 'lubricants', image: 'https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?w=700' },
 ];
 
 const trust = [
