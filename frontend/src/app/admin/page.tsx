@@ -557,33 +557,39 @@ function SettingsPanel() {
     queryFn: async () => (await api.get('/admin/audit-logs')).data.logs,
   });
 
-  async function saveMarkup() {
+ async function saveCjRate() {
+  setSavingRate(true);
+  try {
+    const res = await api.post('/admin/settings/cj-rate', {
+      cjUsdToNgnRate: parseFloat(cjRate),
+    });
 
-    async function saveCjRate() {
-      setSavingRate(true);
-      try {
-        const res = await api.post('/admin/settings/cj-rate', { cjUsdToNgnRate: parseFloat(cjRate) });
-        toast.success(res.data.message);
-        queryClient.invalidateQueries({ queryKey: ['admin-settings'] });
-        queryClient.invalidateQueries({ queryKey: ['admin-products'] });
-      } catch {
-        toast.error('Failed to update CJ rate.');
-      } finally {
-        setSavingRate(false);
-      }
-    }
-    setSaving(true);
-    try {
-      const res = await api.post('/admin/settings/markup', { markupPercent: parseFloat(markup) });
-      toast.success(res.data.message);
-      queryClient.invalidateQueries({ queryKey: ['admin-products'] });
-    } catch {
-      toast.error('Failed to update markup.');
-    } finally {
-      setSaving(false);
-    }
+    toast.success(res.data.message);
+    queryClient.invalidateQueries({ queryKey: ['admin-settings'] });
+    queryClient.invalidateQueries({ queryKey: ['admin-products'] });
+  } catch {
+    toast.error('Failed to update CJ rate.');
+  } finally {
+    setSavingRate(false);
   }
+}
 
+async function saveMarkup() {
+  setSaving(true);
+
+  try {
+    const res = await api.post('/admin/settings/markup', {
+      markupPercent: parseFloat(markup),
+    });
+
+    toast.success(res.data.message);
+    queryClient.invalidateQueries({ queryKey: ['admin-products'] });
+  } catch {
+    toast.error('Failed to update markup.');
+  } finally {
+    setSaving(false);
+  }
+}
   return (
     <div>
       <h1 className="font-display text-2xl font-semibold text-ivory">Settings</h1>
