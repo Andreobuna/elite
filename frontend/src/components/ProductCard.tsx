@@ -1,7 +1,7 @@
 ﻿'use client';
 
 import Link from 'next/link';
-import Image from 'next/image';
+import Image, { type StaticImageData } from 'next/image';
 import { Heart } from 'lucide-react';
 import { motion } from 'framer-motion';
 import StarRating from './StarRating';
@@ -18,8 +18,8 @@ export interface ProductCardData {
   images: { url: string }[];
 }
 
-export default function ProductCard({ product, index = 0 }: { product: ProductCardData; index?: number }) {
-  let image = '/product-placeholder.svg';
+export default function ProductCard({ product, index = 0, fallbackImage = '/product-placeholder.svg' }: { product: ProductCardData; index?: number; fallbackImage?: string | StaticImageData }) {
+  let image: string | StaticImageData = fallbackImage;
   if (product.images && product.images[0] && product.images[0].url) {
     image = product.images[0].url;
   }

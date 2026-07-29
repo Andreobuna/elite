@@ -1,14 +1,24 @@
 ﻿'use client';
 
 import Link from 'next/link';
+import Image, { type StaticImageData } from 'next/image';
 import { motion } from 'framer-motion';
 import { useQuery } from '@tanstack/react-query';
 import { ArrowRight, ShieldCheck, Truck, RefreshCcw, Sparkles } from 'lucide-react';
 import { api } from '@/lib/api';
 import AmbientBackground from '@/components/AmbientBackground';
 import ProductCard, { ProductCardData } from '@/components/ProductCard';
+import accessoriesImage from '../../../../accessories.jpg';
+import lubricantImage from '../../../../lubricant.jpg';
+import viberatorImage from '../../../../viberator.jpg';
 
-const categoryShowcase = [{ name: 'Sexual Wellness', slug: 'sexual-wellness' }, { name: 'Vibrators', slug: 'vibrators' }, { name: 'Accessories', slug: 'accessories' }, { name: 'Lubricants', slug: 'lubricants' }];
+const showcaseImages: StaticImageData[] = [viberatorImage, accessoriesImage, lubricantImage];
+const categoryShowcase = [
+  { name: 'Sexual Wellness', slug: 'sexual-wellness', image: viberatorImage },
+  { name: 'Vibrators', slug: 'vibrators', image: accessoriesImage },
+  { name: 'Accessories', slug: 'accessories', image: lubricantImage },
+  { name: 'Lubricants', slug: 'lubricants', image: viberatorImage },
+];
 const trustBadges = [{ icon: ShieldCheck, label: 'Verified Listings', detail: 'Every item is reviewed before it goes live' }, { icon: Truck, label: 'Discreet Shipping', detail: 'Tracked delivery with plain packaging' }, { icon: RefreshCcw, label: 'Easy Returns', detail: 'Simple return flow on eligible items' }, { icon: Sparkles, label: 'Transparent Pricing', detail: 'Prices are shown in naira' }];
 
 function useProducts(params: Record<string, string> = {}) {
@@ -23,7 +33,7 @@ function useProducts(params: Record<string, string> = {}) {
 
 function CategoryCard({ category, index }: { category: (typeof categoryShowcase)[number]; index: number }) {
   const query = useProducts({ category: category.slug, sort: 'newest', pageSize: '1' });
-  const image = query.data?.[0]?.images?.[0]?.url || '/shop.png';
+  const image = query.data?.[0]?.images?.[0]?.url || category.image.src;
   const title = query.data?.[0]?.title ? category.name + ' - ' + query.data[0].title : category.name;
 
   return (
@@ -45,7 +55,7 @@ export default function HomePage() {
     <main>
       <section className='relative overflow-hidden px-6 pb-24 pt-20 sm:min-h-[88vh] sm:pt-28'>
         <div className='absolute inset-0'>
-          <img src='/shop.png' alt='' className='h-full w-full object-cover object-center object-[center_28%]' />
+          <Image src={viberatorImage} alt='' fill priority sizes='100vw' className='object-cover object-center object-[center_28%]' />
         </div>
         <div className='absolute inset-0 bg-gradient-to-b from-obsidian/10 via-obsidian/28 to-obsidian/75 dark:from-obsidian/12 dark:via-obsidian/30 dark:to-obsidian/82' />
         <AmbientBackground density={22} />
@@ -100,5 +110,5 @@ function ProductGrid({ query, columns = 4, emptyHint }: { query: ReturnType<type
     return <div className='rounded-2xl border border-dashed border-white/10 py-16 text-center'><p className='text-slate'>No products yet.</p>{emptyHint && <p className='mt-2 text-sm text-slate/70'>{emptyHint}</p>}</div>;
   }
 
-  return <div className={columns === 3 ? 'grid grid-cols-2 gap-5 sm:grid-cols-3' : 'grid grid-cols-2 gap-5 sm:grid-cols-4'}>{query.data.map((p, i) => <ProductCard key={p.id} product={p} index={i} />)}</div>;
+  return <div className={columns === 3 ? 'grid grid-cols-2 gap-5 sm:grid-cols-3' : 'grid grid-cols-2 gap-5 sm:grid-cols-4'}>{query.data.map((p, i) => <ProductCard key={p.id} product={p} index={i} fallbackImage={showcaseImages[i % showcaseImages.length]} />)}</div>;
 }
