@@ -43,11 +43,8 @@ export default function HomePage() {
           <img
             src='/shop.png'
             alt=''
-            className='h-full w-full object-cover object-center object-[center_28%] opacity-55 blur-[0.5px] saturate-125 contrast-110 brightness-75 scale-110'
+            className='h-full w-full object-cover object-center object-[center_28%]'
           />
-          <div className='absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(212,175,55,0.18),rgba(7,10,12,0.7)_52%,rgba(7,10,12,0.95)_100%)]' />
-          <div className='absolute inset-0 bg-[linear-gradient(180deg,rgba(7,10,12,0.14)_0%,rgba(7,10,12,0.42)_42%,rgba(7,10,12,0.88)_100%)]' />
-          <div className='absolute inset-0 bg-[linear-gradient(135deg,rgba(212,175,55,0.08)_0%,transparent_38%,rgba(255,255,255,0.03)_58%,transparent_78%,rgba(212,175,55,0.08)_100%)] mix-blend-screen' />
         </div>
         <AmbientBackground density={22} />
         <div className='relative z-10 mx-auto flex max-w-5xl flex-col items-center text-center'>
