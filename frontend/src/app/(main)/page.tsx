@@ -8,11 +8,57 @@ import { api } from '@/lib/api';
 import AmbientBackground from '@/components/AmbientBackground';
 import ProductCard, { ProductCardData } from '@/components/ProductCard';
 
+function makeCategoryArt(title: string, accent: string, subtitle: string) {
+  const svg = `
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 750" fill="none">
+      <defs>
+        <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%" stop-color="#0f0c0a"/>
+          <stop offset="55%" stop-color="${accent}"/>
+          <stop offset="100%" stop-color="#241911"/>
+        </linearGradient>
+        <radialGradient id="glow" cx="0.5" cy="0.2" r="0.8">
+          <stop offset="0%" stop-color="#f7e198" stop-opacity="0.75"/>
+          <stop offset="100%" stop-color="#f7e198" stop-opacity="0"/>
+        </radialGradient>
+      </defs>
+      <rect width="600" height="750" rx="40" fill="url(#bg)"/>
+      <circle cx="160" cy="120" r="130" fill="url(#glow)"/>
+      <circle cx="470" cy="590" r="170" fill="#f7e198" fill-opacity="0.08"/>
+      <path d="M70 540C150 470 238 448 332 470C410 487 477 522 530 575" stroke="#f7e198" stroke-opacity="0.45" stroke-width="14" stroke-linecap="round"/>
+      <path d="M110 180C205 130 320 128 430 174" stroke="#ffffff" stroke-opacity="0.16" stroke-width="10" stroke-linecap="round"/>
+      <g transform="translate(54 478)">
+        <rect x="0" y="0" width="492" height="136" rx="28" fill="#ffffff" fill-opacity="0.08" stroke="#f7e198" stroke-opacity="0.22"/>
+        <text x="34" y="48" fill="#f7f1e8" font-family="Georgia, 'Times New Roman', serif" font-size="28" font-weight="700">${title}</text>
+        <text x="34" y="86" fill="#f7f1e8" fill-opacity="0.78" font-family="Inter, Arial, sans-serif" font-size="18">${subtitle}</text>
+      </g>
+    </svg>
+  `;
+
+  return `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(svg)}`;
+}
+
 const categoryShowcase = [
-  { name: 'Sexual Wellness', slug: 'sexual-wellness', image: 'https://images.unsplash.com/photo-1588596692308-1f2b7c4c8d89?w=600' },
-  { name: 'Vibrators', slug: 'vibrators', image: 'https://images.unsplash.com/photo-1531746790731-6c087fecd65a?w=600' },
-  { name: 'Accessories', slug: 'accessories', image: 'https://images.unsplash.com/photo-1556228578-0d85b1a8f3f8?w=600' },
-  { name: 'Lubricants', slug: 'lubricants', image: 'https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?w=600' },
+  {
+    name: 'Sexual Wellness',
+    slug: 'sexual-wellness',
+    image: makeCategoryArt('Sexual Wellness', '#2a1f18', 'Premium essentials, curated with care'),
+  },
+  {
+    name: 'Vibrators',
+    slug: 'vibrators',
+    image: makeCategoryArt('Vibrators', '#47311f', 'Modern designs for personal pleasure'),
+  },
+  {
+    name: 'Accessories',
+    slug: 'accessories',
+    image: makeCategoryArt('Accessories', '#604222', 'Finishing touches that elevate the mood'),
+  },
+  {
+    name: 'Lubricants',
+    slug: 'lubricants',
+    image: makeCategoryArt('Lubricants', '#3f2d22', 'Comfort-first formulas for every moment'),
+  },
 ];
 
 const trustBadges = [
@@ -46,27 +92,30 @@ export default function HomePage() {
             className='h-full w-full object-cover object-center object-[center_28%]'
           />
         </div>
+        <div className='absolute inset-0 bg-gradient-to-b from-obsidian/20 via-obsidian/55 to-obsidian/90 dark:from-obsidian/35 dark:via-obsidian/65 dark:to-obsidian/92' />
         <AmbientBackground density={22} />
         <div className='relative z-10 mx-auto flex max-w-5xl flex-col items-center text-center'>
           <motion.span initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }} className='section-label mb-6'>
             <span>Shop With Class · Verified · Delivered</span>
           </motion.span>
-          <motion.h1 initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, delay: 0.1, ease: [0.16, 1, 0.3, 1] }} className='font-display text-5xl font-bold leading-[1.05] text-ivory sm:text-6xl lg:text-7xl'>
-            Shop with class
-            <br />
-            for <span className='text-shimmer'>premium essentials</span>
-          </motion.h1>
-          <motion.p initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, delay: 0.25 }} className='mt-6 max-w-xl text-base text-slate-light sm:text-lg'>
-            Explore a refined collection of premium sex toys, clothing, shoes, accessories, and intimate essentials, all with discreet delivery and affordable prices.
-          </motion.p>
-          <motion.div initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, delay: 0.4 }} className='mt-10 flex flex-col gap-4 sm:flex-row'>
-            <Link href='/shop' className='btn-gold'>
-              Start Shopping <ArrowRight size={16} />
-            </Link>
-            <Link href='/adult-wellness' className='btn-ghost'>
-              View Catalog Guide
-            </Link>
-          </motion.div>
+          <div className='glass-panel w-full max-w-4xl rounded-[2rem] border-white/10 px-6 py-10 shadow-[0_30px_90px_-30px_rgba(0,0,0,0.7)] sm:px-10 sm:py-14'>
+            <motion.h1 initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, delay: 0.1, ease: [0.16, 1, 0.3, 1] }} className='font-display text-5xl font-bold leading-[1.05] text-ivory drop-shadow-[0_2px_14px_rgba(0,0,0,0.45)] sm:text-6xl lg:text-7xl dark:text-ivory'>
+              Shop with class
+              <br />
+              for <span className='text-shimmer'>premium essentials</span>
+            </motion.h1>
+            <motion.p initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, delay: 0.25 }} className='mx-auto mt-6 max-w-2xl text-base text-ivory/85 drop-shadow-[0_1px_6px_rgba(0,0,0,0.35)] sm:text-lg dark:text-slate-light'>
+              Explore a refined collection of premium sex toys, clothing, shoes, accessories, and intimate essentials, all with discreet delivery and affordable prices.
+            </motion.p>
+            <motion.div initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, delay: 0.4 }} className='mt-10 flex flex-col justify-center gap-4 sm:flex-row'>
+              <Link href='/shop' className='btn-gold'>
+                Start Shopping <ArrowRight size={16} />
+              </Link>
+              <Link href='/adult-wellness' className='btn-ghost'>
+                View Catalog Guide
+              </Link>
+            </motion.div>
+          </div>
         </div>
       </section>
 
