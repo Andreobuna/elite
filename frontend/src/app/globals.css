@@ -1,4 +1,4 @@
-﻿@tailwind base;
+@tailwind base;
 @tailwind components;
 @tailwind utilities;
 
@@ -11,6 +11,7 @@
   --color-accent: 212 175 55;
   --color-accent-strong: 156 127 36;
   --color-ink: 18 14 12;
+  --text-shadow: 0 1px 2px rgb(0 0 0 / 0.75), 0 0 8px rgb(0 0 0 / 0.3);
   color-scheme: dark;
 }
 
@@ -23,6 +24,7 @@ html.light {
   --color-accent: 176 124 49;
   --color-accent-strong: 131 88 29;
   --color-ink: 18 14 12;
+  --text-shadow: 0 1px 1px rgb(255 255 255 / 0.35), 0 1px 3px rgb(0 0 0 / 0.16);
   color-scheme: light;
 }
 
@@ -64,6 +66,7 @@ body {
     radial-gradient(circle at 88% 10%, rgb(var(--color-text) / 0.05), transparent 26%),
     linear-gradient(180deg, rgb(var(--color-panel) / 0.28), transparent 28%);
   background-attachment: fixed;
+  text-shadow: var(--text-shadow);
 }
 
 :focus-visible {
