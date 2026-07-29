@@ -59,7 +59,7 @@ export default function HomePage() {
             for <span className='text-shimmer'>premium essentials</span>
           </motion.h1>
           <motion.p initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, delay: 0.25 }} className='mt-6 max-w-xl text-base text-slate-light sm:text-lg'>
-            Explore a refined collection of premium sex toys, clothing, shoes, accessories, and intimate essentials, all with discreet delivery and prices shown in naira.
+            Explore a refined collection of premium sex toys, clothing, shoes, accessories, and intimate essentials, all with discreet delivery and affordable prices.
           </motion.p>
           <motion.div initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, delay: 0.4 }} className='mt-10 flex flex-col gap-4 sm:flex-row'>
             <Link href='/shop' className='btn-gold'>

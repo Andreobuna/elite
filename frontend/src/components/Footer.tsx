@@ -37,8 +37,8 @@ export default function Footer() {
           <div>
             <Logo size={34} />
             <p className="mt-4 max-w-xs text-sm leading-relaxed text-slate">
-              Curated adult wellness goods, honest prices. Every product is verified and
-              priced in naira before it reaches you.
+              Curated sex toy, honest prices. Every product is verified and
+              priced with your local bank  before it reaches you.
             </p>
           </div>
           {columns.map((col) => (
