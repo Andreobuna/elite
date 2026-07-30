@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import Link from 'next/link';
 import Image, { type StaticImageData } from 'next/image';
@@ -15,9 +15,9 @@ import viberatorImage from '../../../../viberator.jpg';
 const showcaseImages: StaticImageData[] = [viberatorImage, accessoriesImage, lubricantImage];
 const categoryShowcase = [
   { name: 'Sexual Wellness', slug: 'sexual-wellness', image: viberatorImage },
-  { name: 'Vibrators', slug: 'vibrators', image: accessoriesImage },
-  { name: 'Accessories', slug: 'accessories', image: lubricantImage },
-  { name: 'Lubricants', slug: 'lubricants', image: viberatorImage },
+  { name: 'Vibrator', slug: 'vibrators', image: viberatorImage },
+  { name: 'Accessories', slug: 'accessories', image: accessoriesImage },
+  { name: 'Lubricant', slug: 'lubricants', image: lubricantImage },
 ];
 const trustBadges = [{ icon: ShieldCheck, label: 'Verified Listings', detail: 'Every item is reviewed before it goes live' }, { icon: Truck, label: 'Discreet Shipping', detail: 'Tracked delivery with plain packaging' }, { icon: RefreshCcw, label: 'Easy Returns', detail: 'Simple return flow on eligible items' }, { icon: Sparkles, label: 'Transparent Pricing', detail: 'Prices are shown in naira' }];
 
