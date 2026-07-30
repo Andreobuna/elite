@@ -55,7 +55,7 @@ export default function HomePage() {
     <main>
       <section className='relative overflow-hidden px-6 pb-24 pt-20 sm:min-h-[88vh] sm:pt-28'>
         <div className='absolute inset-0'>
-          <Image src={viberatorImage} alt='' fill priority sizes='100vw' className='object-cover object-center object-[center_28%]' />
+          <Image src='/shop.png' alt='' fill priority sizes='100vw' className='object-cover object-center object-[center_28%]' />
         </div>
         <div className='absolute inset-0 bg-gradient-to-b from-obsidian/10 via-obsidian/28 to-obsidian/75 dark:from-obsidian/12 dark:via-obsidian/30 dark:to-obsidian/82' />
         <AmbientBackground density={22} />
