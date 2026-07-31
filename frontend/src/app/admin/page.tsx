@@ -190,6 +190,7 @@ function ProductSync() {
   const [stock, setStock] = useState('1');
   const [discountPercent, setDiscountPercent] = useState('0');
   const [description, setDescription] = useState('');
+  const [manualCategorySlug, setManualCategorySlug] = useState('sexual-wellness');
   const [imageDataUrl, setImageDataUrl] = useState('');
   const [imageUrl, setImageUrl] = useState('');
   const [editingProductId, setEditingProductId] = useState('');
@@ -198,6 +199,7 @@ function ProductSync() {
   const [editStock, setEditStock] = useState('1');
   const [editDiscountPercent, setEditDiscountPercent] = useState('0');
   const [editDescription, setEditDescription] = useState('');
+  const [editCategorySlug, setEditCategorySlug] = useState('sexual-wellness');
   const [editImageDataUrl, setEditImageDataUrl] = useState('');
   const [editImageUrl, setEditImageUrl] = useState('');
   const [editing, setEditing] = useState(false);
@@ -236,6 +238,7 @@ function ProductSync() {
         discountPercent: Number(discountPercent || 0),
         imageDataUrl: imageDataUrl || undefined,
         imageUrl: imageDataUrl ? undefined : imageUrl || undefined,
+        categorySlug: manualCategorySlug,
       };
       const res = await api.post('/admin/products', payload);
       toast.success(res.data.message || 'Manual product created.');
@@ -244,6 +247,7 @@ function ProductSync() {
       setStock('1');
       setDiscountPercent('0');
       setDescription('');
+      setManualCategorySlug('sexual-wellness');
       setImageDataUrl('');
       setImageUrl('');
       queryClient.invalidateQueries({ queryKey: ['admin-products'] });
@@ -281,6 +285,10 @@ function ProductSync() {
   }
 
   const manualProducts = (products ?? []).filter((p: any) => String(p.aliexpressId ?? '').startsWith('MANUAL-'));
+  const manualCategoryOptions = [
+    { label: 'Sexual Wellness', value: 'sexual-wellness' },
+    { label: 'Gift Ideas', value: 'gift-ideas' },
+  ];
 
   function startEditingProduct(product: any) {
     setEditingProductId(product.id);
@@ -289,6 +297,7 @@ function ProductSync() {
     setEditStock(String(product.stock ?? '1'));
     setEditDiscountPercent(product.basePrice > product.sellingPrice ? String(Math.round((1 - Number(product.sellingPrice) / Number(product.basePrice)) * 100)) : '0');
     setEditDescription(product.description ?? '');
+    setEditCategorySlug(product.category?.slug === 'gift-ideas' ? 'gift-ideas' : 'sexual-wellness');
     setEditImageDataUrl('');
     setEditImageUrl(product.images?.[0]?.url ?? '');
   }
@@ -309,6 +318,7 @@ function ProductSync() {
         discountPercent: Number(editDiscountPercent || 0),
         imageDataUrl: editImageDataUrl || undefined,
         imageUrl: editImageDataUrl ? undefined : editImageUrl || undefined,
+        categorySlug: editCategorySlug,
       };
       const res = await api.patch(`/admin/products/${editingProductId}`, payload);
       toast.success(res.data.message || 'Manual product updated.');
@@ -338,6 +348,13 @@ function ProductSync() {
           <input value={price} onChange={(e) => setPrice(e.target.value)} placeholder="Price" type="number" step="0.01" min="0" className="input-elite" />
           <input value={stock} onChange={(e) => setStock(e.target.value)} placeholder="Amount available" type="number" min="0" className="input-elite" />
           <input value={discountPercent} onChange={(e) => setDiscountPercent(e.target.value)} placeholder="Discount % (optional)" type="number" step="0.1" min="0" max="100" className="input-elite" />
+          <select value={manualCategorySlug} onChange={(e) => setManualCategorySlug(e.target.value)} className="input-elite">
+            {manualCategoryOptions.map((option) => (
+              <option key={option.value} value={option.value}>
+                {option.label}
+              </option>
+            ))}
+          </select>
           <input value={imageUrl} onChange={(e) => setImageUrl(e.target.value)} placeholder="Image URL (optional fallback)" className="input-elite md:col-span-2" />
           <input type="file" accept="image/*" onChange={(e) => onFileChange(e.target.files?.[0] ?? null)} className="input-elite md:col-span-2" />
           <textarea value={description} onChange={(e) => setDescription(e.target.value)} placeholder="Write-up about the product" rows={4} className="input-elite md:col-span-2" />
@@ -347,7 +364,7 @@ function ProductSync() {
           <button onClick={handleCreateManualProduct} disabled={creating} className="btn-gold disabled:opacity-60">
             {creating ? 'CreatingÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¦' : 'Create Product'}
           </button>
-          <p className="text-xs text-slate">The product will be saved in Sexual Wellness and surfaced before synced items.</p>
+          <p className="text-xs text-slate">Manual products can be saved in Sexual Wellness or Gift Ideas and will surface before synced items.</p>
         </div>
 
         {(imageDataUrl || imageUrl) && (
@@ -384,6 +401,13 @@ function ProductSync() {
           <input value={editPrice} onChange={(e) => setEditPrice(e.target.value)} placeholder="Price" type="number" step="0.01" min="0" className="input-elite" />
           <input value={editStock} onChange={(e) => setEditStock(e.target.value)} placeholder="Amount available" type="number" min="0" className="input-elite" />
           <input value={editDiscountPercent} onChange={(e) => setEditDiscountPercent(e.target.value)} placeholder="Discount % (optional)" type="number" step="0.1" min="0" max="100" className="input-elite" />
+          <select value={editCategorySlug} onChange={(e) => setEditCategorySlug(e.target.value)} className="input-elite">
+            {manualCategoryOptions.map((option) => (
+              <option key={option.value} value={option.value}>
+                {option.label}
+              </option>
+            ))}
+          </select>
           <input value={editImageUrl} onChange={(e) => setEditImageUrl(e.target.value)} placeholder="Image URL (optional fallback)" className="input-elite md:col-span-2" />
           <input type="file" accept="image/*" onChange={(e) => onEditFileChange(e.target.files?.[0] ?? null)} className="input-elite md:col-span-2" />
           <textarea value={editDescription} onChange={(e) => setEditDescription(e.target.value)} placeholder="Write-up about the product" rows={4} className="input-elite md:col-span-2" />
@@ -393,7 +417,7 @@ function ProductSync() {
           <button onClick={handleUpdateManualProduct} disabled={editing || !editingProductId} className="btn-gold disabled:opacity-60">
             {editing ? 'SavingÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¦' : 'Save Changes'}
           </button>
-          <p className="text-xs text-slate">Only products created manually can be updated here.</p>
+          <p className="text-xs text-slate">Only products created manually can be updated here, and you can move them between Sexual Wellness and Gift Ideas.</p>
         </div>
 
         {(editImageDataUrl || editImageUrl) && (

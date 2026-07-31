@@ -7,6 +7,7 @@ import { prisma } from '../config/prisma';
 import { AppError } from '../middleware/errorHandler';
 import { AuthedRequest } from '../middleware/auth';
 import { createCJOrder } from '../utils/cjOrders';
+import { logger } from '../utils/logger';
 
 async function finalizePaystackPayment(reference: string, userId?: string) {
   const trimmed = String(reference || '').trim();
@@ -19,29 +20,64 @@ async function finalizePaystackPayment(reference: string, userId?: string) {
   });
   if (!payment) throw new AppError('Payment session not found.', 404);
   if (userId && payment.order.userId !== userId) throw new AppError('You cannot verify another user payment.', 403);
-  if (payment.status === PaymentStatus.SUCCEEDED && payment.order.status === OrderStatus.PAID) {
-    return { payment, order: payment.order, alreadyVerified: true };
+
+  const alreadySucceeded = payment.status === PaymentStatus.SUCCEEDED && payment.order.status === OrderStatus.PAID;
+  if (!alreadySucceeded) {
+    const verifyUrl = 'https://api.paystack.co/transaction/verify/' + encodeURIComponent(trimmed);
+    const { data } = await axios.get(verifyUrl, { headers: { Authorization: 'Bearer ' + env.paystack.secretKey } });
+    const tx = data?.data;
+    if (!tx || String(tx.status).toLowerCase() !== 'success') throw new AppError('Payment was not successful.', 400);
+    if (Number(tx.amount) !== Number(payment.amount) * 100) throw new AppError('Verified amount does not match the order total.', 400);
+
+    const updatedPayment = await prisma.payment.update({
+      where: { id: payment.id },
+      data: { status: PaymentStatus.SUCCEEDED, currency: tx.currency ?? payment.currency, providerRef: tx.reference ?? trimmed },
+    });
+    await prisma.transaction.create({ data: { paymentId: payment.id, type: 'charge', amount: payment.amount, rawPayload: tx } });
+    const updatedOrder = await prisma.order.update({ where: { id: payment.orderId }, data: { status: OrderStatus.PAID } });
+
+    try {
+      const fulfillment = await createCJOrder(updatedOrder.id);
+      if (fulfillment.cjOrderId) {
+        logger.info('[payments] CJ fulfillment processed after Paystack verification', {
+          orderId: fulfillment.orderId,
+          orderNumber: fulfillment.orderNumber,
+          cjOrderId: fulfillment.cjOrderId,
+          status: fulfillment.status,
+          eligibleItems: fulfillment.eligibleItems,
+          manualReviewItems: fulfillment.manualReviewItems,
+        });
+      }
+    } catch (error) {
+      logger.error('[payments] Failed to create CJ order after Paystack verification', {
+        orderId: payment.orderId,
+        error: error instanceof Error ? error.message : error,
+      });
+    }
+
+    return { payment: updatedPayment, order: updatedOrder, alreadyVerified: false };
   }
 
-  const verifyUrl = 'https://api.paystack.co/transaction/verify/' + encodeURIComponent(trimmed);
-  const { data } = await axios.get(verifyUrl, { headers: { Authorization: 'Bearer ' + env.paystack.secretKey } });
-  const tx = data?.data;
-  if (!tx || String(tx.status).toLowerCase() !== 'success') throw new AppError('Payment was not successful.', 400);
-  if (Number(tx.amount) !== Number(payment.amount) * 100) throw new AppError('Verified amount does not match the order total.', 400);
-
-  const updatedPayment = await prisma.payment.update({
-    where: { id: payment.id },
-    data: { status: PaymentStatus.SUCCEEDED, currency: tx.currency ?? payment.currency, providerRef: tx.reference ?? trimmed },
-  });
-  await prisma.transaction.create({ data: { paymentId: payment.id, type: 'charge', amount: payment.amount, rawPayload: tx } });
-  const updatedOrder = await prisma.order.update({ where: { id: payment.orderId }, data: { status: OrderStatus.PAID } });
   try {
-  await createCJOrder(updatedOrder.id);
-  console.log(`CJ order created for ${updatedOrder.orderNumber}`);
-} catch (error) {
-  console.error('Failed to create CJ order:', error);
-}
-  return { payment: updatedPayment, order: updatedOrder, alreadyVerified: false };
+    const fulfillment = await createCJOrder(payment.orderId);
+    if (fulfillment.cjOrderId) {
+      logger.info('[payments] CJ fulfillment checked for already verified payment', {
+        orderId: fulfillment.orderId,
+        orderNumber: fulfillment.orderNumber,
+        cjOrderId: fulfillment.cjOrderId,
+        status: fulfillment.status,
+        eligibleItems: fulfillment.eligibleItems,
+        manualReviewItems: fulfillment.manualReviewItems,
+      });
+    }
+  } catch (error) {
+    logger.error('[payments] Failed to process CJ fulfillment for already verified payment', {
+      orderId: payment.orderId,
+      error: error instanceof Error ? error.message : error,
+    });
+  }
+
+  return { payment, order: payment.order, alreadyVerified: true };
 }
 
 export async function verifyPaystackPayment(req: AuthedRequest, res: Response, next: NextFunction) {

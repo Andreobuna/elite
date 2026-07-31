@@ -10,6 +10,21 @@ import { AuthedRequest } from '../middleware/auth';
 
 const MANUAL_PRODUCT_PREFIX = 'MANUAL-';
 const SEXUAL_WELLNESS_SLUG = 'sexual-wellness';
+const GIFT_IDEAS_SLUG = 'gift-ideas';
+const MANUAL_CATEGORY_META = {
+  [SEXUAL_WELLNESS_SLUG]: { name: 'Sexual Wellness', slug: SEXUAL_WELLNESS_SLUG },
+  [GIFT_IDEAS_SLUG]: { name: 'Gift Ideas', slug: GIFT_IDEAS_SLUG },
+} as const;
+
+type ManualCategorySlug = keyof typeof MANUAL_CATEGORY_META;
+
+function normalizeManualCategorySlug(value?: string): ManualCategorySlug {
+  return value === GIFT_IDEAS_SLUG ? GIFT_IDEAS_SLUG : SEXUAL_WELLNESS_SLUG;
+}
+
+function getManualCategoryName(slug: ManualCategorySlug) {
+  return MANUAL_CATEGORY_META[slug].name;
+}
 
 function isManualProduct(product: { aliexpressId: string | null }) {
   return Boolean(product.aliexpressId && product.aliexpressId.startsWith(MANUAL_PRODUCT_PREFIX));
@@ -250,7 +265,7 @@ export async function syncFromCjDropshipping(req: Request, res: Response, next: 
 }
 
 export async function createManualProduct(req: AuthedRequest, res: Response, next: NextFunction) {
-  const { name, price, stock, description, discountPercent, imageDataUrl, imageUrl } = req.body as {
+  const { name, price, stock, description, discountPercent, imageDataUrl, imageUrl, categorySlug: requestedCategorySlug } = req.body as {
     name?: string;
     price?: string | number;
     stock?: string | number;
@@ -258,6 +273,7 @@ export async function createManualProduct(req: AuthedRequest, res: Response, nex
     discountPercent?: string | number;
     imageDataUrl?: string;
     imageUrl?: string;
+    categorySlug?: string;
   };
 
   try {
@@ -267,6 +283,7 @@ export async function createManualProduct(req: AuthedRequest, res: Response, nex
     const numericStock = Math.max(0, Math.floor(toNumber(stock, 0)));
     const numericDiscount = Math.min(100, Math.max(0, toNumber(discountPercent, 0)));
     const resolvedImage = buildImageUrl(imageDataUrl, imageUrl);
+    const categorySlug = normalizeManualCategorySlug(requestedCategorySlug);
 
     if (!title) throw new AppError('Product name is required.');
     if (!writeUp) throw new AppError('Product description is required.');
@@ -274,15 +291,15 @@ export async function createManualProduct(req: AuthedRequest, res: Response, nex
     if (!resolvedImage) throw new AppError('Product image is required.');
 
     const category = await prisma.category.upsert({
-      where: { slug: SEXUAL_WELLNESS_SLUG },
+      where: { slug: categorySlug },
       update: {},
-      create: { name: 'Sexual Wellness', slug: SEXUAL_WELLNESS_SLUG },
+      create: { name: getManualCategoryName(categorySlug), slug: categorySlug },
     });
 
     const basePrice = Math.round(numericPrice * 100) / 100;
     const sellingPrice = Math.max(0, Math.round(basePrice * (1 - numericDiscount / 100) * 100) / 100);
     const aliexpressId = buildManualProductId();
-    const slug = `${slugify(title)}-${aliexpressId.slice(-6)}`;
+    const slug = slugify(title) + '-' + aliexpressId.slice(-6);
 
     const product = await prisma.product.create({
       data: {
@@ -327,9 +344,10 @@ export async function createManualProduct(req: AuthedRequest, res: Response, nex
       return next(err);
     }
 
+    const offlineCategorySlug = normalizeManualCategorySlug(requestedCategorySlug);
     return res.status(201).json({
       product: {
-        id: `offline-${Date.now()}`,
+        id: 'offline-' + Date.now(),
         aliexpressId: buildManualProductId(),
         title: name,
         slug: slugify(String(name ?? 'product')),
@@ -343,8 +361,8 @@ export async function createManualProduct(req: AuthedRequest, res: Response, nex
         ratingAverage: 0,
         ratingCount: 0,
         categoryId: null,
-        category: { id: 'offline-sexual-wellness', name: 'Sexual Wellness', slug: SEXUAL_WELLNESS_SLUG },
-        images: [{ id: `offline-${Date.now()}-image`, productId: `offline-${Date.now()}`, url: imageDataUrl || imageUrl || '', altText: null, position: 0 }],
+        category: { id: 'offline-' + offlineCategorySlug, name: getManualCategoryName(offlineCategorySlug), slug: offlineCategorySlug },
+        images: [{ id: 'offline-' + Date.now() + '-image', productId: 'offline-' + Date.now(), url: imageDataUrl || imageUrl || '', altText: null, position: 0 }],
       },
       message: 'Manual product created in offline mode.',
     });
@@ -352,7 +370,7 @@ export async function createManualProduct(req: AuthedRequest, res: Response, nex
 }
 
 export async function updateManualProduct(req: AuthedRequest, res: Response, next: NextFunction) {
-  const { name, price, stock, description, discountPercent, imageDataUrl, imageUrl } = req.body as {
+  const { name, price, stock, description, discountPercent, imageDataUrl, imageUrl, categorySlug: requestedCategorySlug } = req.body as {
     name?: string;
     price?: string | number;
     stock?: string | number;
@@ -360,6 +378,7 @@ export async function updateManualProduct(req: AuthedRequest, res: Response, nex
     discountPercent?: string | number;
     imageDataUrl?: string;
     imageUrl?: string;
+    categorySlug?: string;
   };
 
   try {
@@ -373,14 +392,21 @@ export async function updateManualProduct(req: AuthedRequest, res: Response, nex
     const numericStock = Math.max(0, Math.floor(toNumber(stock, existing.stock)));
     const numericDiscount = Math.min(100, Math.max(0, toNumber(discountPercent, 0)));
     const resolvedImage = buildImageUrl(imageDataUrl, imageUrl);
+    const categorySlug = normalizeManualCategorySlug(requestedCategorySlug ?? existing.category?.slug);
 
     if (!title) throw new AppError('Product name is required.');
     if (!writeUp) throw new AppError('Product description is required.');
     if (!Number.isFinite(numericPrice) || numericPrice <= 0) throw new AppError('Product price must be greater than zero.');
 
+    const category = await prisma.category.upsert({
+      where: { slug: categorySlug },
+      update: {},
+      create: { name: getManualCategoryName(categorySlug), slug: categorySlug },
+    });
+
     const basePrice = Math.round(numericPrice * 100) / 100;
     const sellingPrice = Math.max(0, Math.round(basePrice * (1 - numericDiscount / 100) * 100) / 100);
-    const slug = existing.slug.startsWith('manual-') ? `${slugify(title)}-${existing.aliexpressId?.slice(-6) ?? existing.id.slice(0, 6)}` : existing.slug;
+    const slug = existing.slug.startsWith('manual-') ? slugify(title) + '-' + (existing.aliexpressId?.slice(-6) ?? existing.id.slice(0, 6)) : existing.slug;
 
     const product = await prisma.product.update({
       where: { id: existing.id },
@@ -392,6 +418,7 @@ export async function updateManualProduct(req: AuthedRequest, res: Response, nex
         sellingPrice,
         stock: numericStock,
         sourceBasePrice: null,
+        categoryId: category.id,
         images: resolvedImage
           ? {
               deleteMany: {},
@@ -418,10 +445,11 @@ export async function updateManualProduct(req: AuthedRequest, res: Response, nex
       return next(err);
     }
 
+    const offlineCategorySlug = normalizeManualCategorySlug(requestedCategorySlug);
     return res.json({
       product: {
         id: req.params.id,
-        aliexpressId: `${MANUAL_PRODUCT_PREFIX}offline`,
+        aliexpressId: 'MANUAL-offline',
         title: name,
         slug: slugify(String(name ?? 'product')),
         description,
@@ -434,13 +462,14 @@ export async function updateManualProduct(req: AuthedRequest, res: Response, nex
         ratingAverage: 0,
         ratingCount: 0,
         categoryId: null,
-        category: { id: 'offline-sexual-wellness', name: 'Sexual Wellness', slug: SEXUAL_WELLNESS_SLUG },
-        images: [{ id: `offline-${Date.now()}-image`, productId: req.params.id, url: imageDataUrl || imageUrl || '', altText: null, position: 0 }],
+        category: { id: 'offline-' + offlineCategorySlug, name: getManualCategoryName(offlineCategorySlug), slug: offlineCategorySlug },
+        images: [{ id: 'offline-' + Date.now() + '-image', productId: req.params.id, url: imageDataUrl || imageUrl || '', altText: null, position: 0 }],
       },
       message: 'Manual product updated in offline mode.',
     });
   }
 }
+
 export async function getProductDetailPreview(req: Request, res: Response, next: NextFunction) {
   try {
     const detail = await getProductDetail(req.params.cjProductId);
