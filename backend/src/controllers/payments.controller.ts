@@ -6,6 +6,7 @@ import { env } from '../config/env';
 import { prisma } from '../config/prisma';
 import { AppError } from '../middleware/errorHandler';
 import { AuthedRequest } from '../middleware/auth';
+import { createCJOrder } from '../utils/cjOrders';
 
 async function finalizePaystackPayment(reference: string, userId?: string) {
   const trimmed = String(reference || '').trim();
@@ -34,6 +35,12 @@ async function finalizePaystackPayment(reference: string, userId?: string) {
   });
   await prisma.transaction.create({ data: { paymentId: payment.id, type: 'charge', amount: payment.amount, rawPayload: tx } });
   const updatedOrder = await prisma.order.update({ where: { id: payment.orderId }, data: { status: OrderStatus.PAID } });
+  try {
+  await createCJOrder(updatedOrder.id);
+  console.log(`CJ order created for ${updatedOrder.orderNumber}`);
+} catch (error) {
+  console.error('Failed to create CJ order:', error);
+}
   return { payment: updatedPayment, order: updatedOrder, alreadyVerified: false };
 }
 

@@ -1,4 +1,5 @@
-﻿import axios from 'axios';
+﻿import { prisma } from "../config/prisma";
+import axios from 'axios';
 import { env } from '../config/env';
 import { logger } from './logger';
 

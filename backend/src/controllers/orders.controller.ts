@@ -21,7 +21,7 @@ export async function createOrder(req: AuthedRequest, res: Response, next: NextF
     for (const item of visibleItems) { const unit = Number(item.product.sellingPrice) + Number(item.variant?.priceDelta ?? 0); subtotal += unit * item.quantity; }
     let discountTotal = 0; let coupon = null;
     if (couponCode) { coupon = await prisma.coupon.findUnique({ where: { code: couponCode } }); if (coupon && coupon.isActive && (!coupon.expiresAt || coupon.expiresAt > new Date())) { discountTotal = coupon.discountType === 'PERCENT' ? subtotal * (Number(coupon.discountValue) / 100) : Number(coupon.discountValue); } }
-    const shippingTotal = subtotal > 50 ? 0 : 5.99;
+    const shippingTotal = 199;
     const grandTotal = Math.max(subtotal - discountTotal + shippingTotal, 0);
     const orderNumber = 'EXS-' + Date.now().toString(36).toUpperCase();
     const user = await prisma.user.findUnique({ where: { id: userId } });
