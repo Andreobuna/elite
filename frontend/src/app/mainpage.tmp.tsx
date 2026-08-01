@@ -8,23 +8,17 @@ import { ArrowRight, ShieldCheck, Truck, RefreshCcw, Sparkles } from 'lucide-rea
 import { api } from '@/lib/api';
 import AmbientBackground from '@/components/AmbientBackground';
 import ProductCard, { ProductCardData } from '@/components/ProductCard';
-import tenImage from '../../../ten.png';
-import accessoriesImage from '../../../accessories.jpg';
-import downloadImage from '../../../download.webp';
-import viberatorImage from '../../../viberator.jpg';
+import accessoriesImage from '../../../../accessories.jpg';
+import downloadImage from '../../../../download.webp';
+import viberatorImage from '../../../../viberator.jpg';
 
-const showcaseImages: StaticImageData[] = [tenImage, viberatorImage, accessoriesImage, downloadImage];
+const showcaseImages: StaticImageData[] = [viberatorImage, accessoriesImage, downloadImage];
 const categoryShowcase = [
   { name: 'Sexual Wellness', slug: 'sexual-wellness', image: viberatorImage },
   { name: 'Gift Ideas', slug: 'gift-ideas', image: accessoriesImage },
   { name: 'Premium Collection', slug: 'premium-collection', image: downloadImage },
 ];
-const trustBadges = [
-  { icon: ShieldCheck, label: 'Verified Listings', detail: 'Every item is reviewed before it goes live' },
-  { icon: Truck, label: 'Discreet Shipping', detail: 'Tracked delivery with plain packaging' },
-  { icon: RefreshCcw, label: 'Easy Returns', detail: 'Simple return flow on eligible items' },
-  { icon: Sparkles, label: 'Transparent Pricing', detail: 'Prices are shown in naira' },
-];
+const trustBadges = [{ icon: ShieldCheck, label: 'Verified Listings', detail: 'Every item is reviewed before it goes live' }, { icon: Truck, label: 'Discreet Shipping', detail: 'Tracked delivery with plain packaging' }, { icon: RefreshCcw, label: 'Easy Returns', detail: 'Simple return flow on eligible items' }, { icon: Sparkles, label: 'Transparent Pricing', detail: 'Prices are shown in naira' }];
 
 function useProducts(params: Record<string, string> = {}) {
   return useQuery({
@@ -60,11 +54,11 @@ export default function HomePage() {
     <main>
       <section className='relative overflow-hidden px-6 pb-24 pt-20 sm:min-h-[88vh] sm:pt-28'>
         <div className='absolute inset-0'>
-          <Image src='/ten.png' alt='' fill priority sizes='100vw' className='object-cover object-center object-[center_28%]' />
+          <Image src='/toto.png' alt='' fill priority sizes='100vw' className='object-cover object-center object-[center_28%]' />
         </div>
         <div className='absolute inset-0 bg-gradient-to-b from-obsidian/10 via-obsidian/28 to-obsidian/75 dark:from-obsidian/12 dark:via-obsidian/30 dark:to-obsidian/82' />
         <AmbientBackground density={22} />
-        <div className='relative z-10 mx-auto flex max-w-5xl flex-col items-center rounded-[2rem] border border-white/10 bg-obsidian/30 px-6 py-10 text-center shadow-[0_30px_90px_-30px_rgba(0,0,0,0.75)] backdrop-blur-xl sm:px-10 sm:py-14'>
+        <div className='relative z-10 mx-auto flex max-w-5xl flex-col items-center text-center'>
           <motion.span initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }} className='section-label mb-6'>
             <span>Shop With Class - Verified - Delivered</span>
           </motion.span>
@@ -80,7 +74,7 @@ export default function HomePage() {
       <section className='border-y border-white/5 bg-charcoal/30 px-6 py-10'>
         <div className='mx-auto grid max-w-6xl grid-cols-2 gap-8 sm:grid-cols-4'>
           {trustBadges.map((b, i) => (
-            <motion.div key={b.label} initial={{ opacity: 0, y: 16 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.5, delay: i * 0.08 }} className='glass-panel flex flex-col items-center gap-3 rounded-2xl px-4 py-4 text-center sm:flex-row sm:text-left'>
+            <motion.div key={b.label} initial={{ opacity: 0, y: 16 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.5, delay: i * 0.08 }} className='flex flex-col items-center gap-2 text-center sm:flex-row sm:text-left'>
               <b.icon size={22} className='shrink-0 text-gold' />
               <div><p className='text-sm font-semibold text-ivory'>{b.label}</p><p className='text-xs text-slate'>{b.detail}</p></div>
             </motion.div>
@@ -88,7 +82,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section className='border-b border-white/5 bg-gradient-to-b from-charcoal/20 to-transparent px-6 py-4'>\n        <div className='mx-auto max-w-7xl overflow-hidden rounded-full border border-white/8 bg-white/4 py-3 backdrop-blur-md'>\n          <div className='flex w-[200%] items-center gap-8 px-4 text-xs uppercase tracking-[0.35em] text-ivory/75 animate-marquee sm:text-sm'>\n            <span>Verified products</span>\n            <span>Discreet delivery</span>\n            <span>Luxury visuals</span>\n            <span>Transparent pricing</span>\n            <span>Curated essentials</span>\n            <span>Verified products</span>\n            <span>Discreet delivery</span>\n            <span>Luxury visuals</span>\n          </div>\n        </div>\n      </section>\n      <section className='mx-auto max-w-7xl px-6 py-20'>
+      <section className='mx-auto max-w-7xl px-6 py-20'>
         <div className='mb-10 flex items-end justify-between'><div><p className='section-label mb-3'>Browse</p><h2 className='font-display text-3xl font-semibold text-ivory sm:text-4xl'>Shop by Category</h2></div></div>
         <div className='grid grid-cols-2 gap-4 sm:grid-cols-4'>{categoryShowcase.map((cat, i) => <CategoryCard key={cat.slug} category={cat} index={i} />)}</div>
       </section>
