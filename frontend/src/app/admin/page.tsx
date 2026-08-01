@@ -21,13 +21,14 @@ function resolveProductImage(product: { images?: { url?: string }[] }) {
   return image;
 }
 
-type Tab = 'overview' | 'sync' | 'orders' | 'customers' | 'settings';
+type Tab = 'overview' | 'sync' | 'orders' | 'customers' | 'sessions' | 'settings';
 
 const tabs: { id: Tab; label: string; icon: any }[] = [
   { id: 'overview', label: 'Overview', icon: LayoutGrid },
   { id: 'sync', label: 'Product Sync', icon: Package },
   { id: 'orders', label: 'Orders', icon: ShoppingCart },
   { id: 'customers', label: 'Customers', icon: Users },
+  { id: 'sessions', label: 'Sessions', icon: ScrollText },
   { id: 'settings', label: 'Settings', icon: SettingsIcon },
 ];
 
@@ -83,6 +84,7 @@ export default function AdminDashboard() {
             {tab === 'sync' && <ProductSync />}
             {tab === 'orders' && <OrdersPanel />}
             {tab === 'customers' && <CustomersPanel />}
+            {tab === 'sessions' && <SessionsPanel />}
             {tab === 'settings' && <SettingsPanel />}
           </motion.div>
         </AnimatePresence>
@@ -512,6 +514,42 @@ function OrdersPanel() {
               >
                 {statuses.map((s) => <option key={s} value={s}>{s}</option>)}
               </select>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function SessionsPanel() {
+  const { data, isLoading, error } = useQuery({
+    queryKey: ['admin-sessions'],
+    queryFn: async () => (await api.get('/admin/sessions')).data.sessions,
+  });
+
+  return (
+    <div>
+      <h1 className="font-display text-2xl font-semibold text-ivory">Active Sessions</h1>
+      {isLoading ? (
+        <div className="mt-6 space-y-2">{[1, 2, 3].map((i) => <div key={i} className="skeleton h-14 rounded-xl" />)}</div>
+      ) : error ? (
+        <p className="mt-6 rounded-2xl border border-red-500/20 bg-red-500/10 p-4 text-sm text-red-200">
+          Unable to load active sessions right now.
+        </p>
+      ) : (data ?? []).length === 0 ? (
+        <p className="mt-6 rounded-2xl border border-white/5 bg-charcoal/50 p-4 text-sm text-slate">
+          No active sessions found.
+        </p>
+      ) : (
+        <div className="mt-6 space-y-3 rounded-2xl border border-white/5 bg-charcoal/50 p-6">
+          {(data ?? []).map((session: any) => (
+            <div key={session.id} className="flex flex-wrap items-center justify-between gap-3 rounded-xl bg-white/[0.02] px-4 py-3">
+              <div>
+                <p className="font-display text-ivory">{session.user.firstName} {session.user.lastName}</p>
+                <p className="text-xs text-slate">{session.user.email} � {session.user.role}</p>
+              </div>
+              <p className="text-xs text-slate">Signed in {new Date(session.createdAt).toLocaleString()}</p>
             </div>
           ))}
         </div>

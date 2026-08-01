@@ -161,6 +161,25 @@ export async function listAuditLogs(req: AuthedRequest, res: Response, next: Nex
   }
 }
 
+export async function listSessions(req: AuthedRequest, res: Response, next: NextFunction) {
+  try {
+    const sessions = await prisma.session.findMany({
+      where: { expiresAt: { gt: new Date() } },
+      take: 100,
+      orderBy: { createdAt: 'desc' },
+      include: { user: { select: { id: true, firstName: true, lastName: true, email: true, role: true } } },
+    })
+
+    res.json({ sessions })
+  } catch (err) {
+    if (!isDatabaseUnavailable(err)) {
+      return next(err)
+    }
+
+    res.json({ sessions: [] })
+  }
+}
+
 export async function createCoupon(req: AuthedRequest, res: Response, next: NextFunction) {
   const { code, description, discountType, discountValue, minSpend, maxUses, expiresAt } = req.body;
   try {

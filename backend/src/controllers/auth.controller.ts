@@ -22,6 +22,14 @@ const REFRESH_COOKIE = 'refreshToken';
 const ACCESS_COOKIE = 'accessToken';
 const DEMO_ADMIN_EMAIL = 'admin@elitexshop.com';
 
+function recordAuthAuditLog(userId: string | null | undefined, action: string, metadata?: Record<string, unknown>) {
+  if (!userId) return;
+
+  void prisma.auditLog.create({
+    data: { userId, action, metadata: metadata as any },
+  }).catch(() => undefined);
+}
+
 function setAuthCookies(res: Response, accessToken: string, refreshToken: string) {
   const secure = env.nodeEnv === 'production';
   res.cookie(ACCESS_COOKIE, accessToken, {
@@ -73,6 +81,10 @@ export async function register(req: Request, res: Response, next: NextFunction) 
     });
 
     setAuthCookies(res, accessToken, refreshToken);
+    recordAuthAuditLog(user.id, 'SIGN_UP', {
+      userAgent: req.headers['user-agent'],
+      ipAddress: req.ip,
+    });
 
     void sendWelcomeEmail(email, firstName).catch(() => undefined);
 
@@ -96,6 +108,10 @@ export async function register(req: Request, res: Response, next: NextFunction) 
     const accessToken = signAccessToken({ sub: user.id, role: user.role, email: user.email });
     const refreshToken = fallbackCreateSession(user.id);
     setAuthCookies(res, accessToken, refreshToken);
+    recordAuthAuditLog(user.id, 'SIGN_UP', {
+      userAgent: req.headers['user-agent'],
+      ipAddress: req.ip,
+    });
 
     res.status(201).json({
       message: 'Account created in offline mode. You are now signed in.',
@@ -136,6 +152,10 @@ export async function login(req: Request, res: Response, next: NextFunction) {
       });
 
       setAuthCookies(res, accessToken, refreshToken);
+      recordAuthAuditLog(user.id, 'SIGN_IN', {
+        userAgent: req.headers['user-agent'],
+        ipAddress: req.ip,
+      });
       res.json({
         accessToken,
         user: toPublicUser(user),
@@ -148,6 +168,10 @@ export async function login(req: Request, res: Response, next: NextFunction) {
       const { user: fallbackUser, refreshToken } = fallbackResult;
       const accessToken = signAccessToken({ sub: fallbackUser.id, role: fallbackUser.role, email: fallbackUser.email });
       setAuthCookies(res, accessToken, refreshToken);
+      recordAuthAuditLog(fallbackUser.id, 'SIGN_IN', {
+        userAgent: req.headers['user-agent'],
+        ipAddress: req.ip,
+      });
       res.json({
         accessToken,
         user: toPublicUser(fallbackUser),
@@ -170,6 +194,10 @@ export async function login(req: Request, res: Response, next: NextFunction) {
     const { user, refreshToken } = loginResult;
     const accessToken = signAccessToken({ sub: user.id, role: user.role, email: user.email });
     setAuthCookies(res, accessToken, refreshToken);
+    recordAuthAuditLog(user.id, 'SIGN_IN', {
+      userAgent: req.headers['user-agent'],
+      ipAddress: req.ip,
+    });
     res.json({
       accessToken,
       user: toPublicUser(user),
