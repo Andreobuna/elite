@@ -64,7 +64,7 @@ export default function HomePage() {
         </div>
         <div className='absolute inset-0 bg-gradient-to-b from-obsidian/10 via-obsidian/28 to-obsidian/75 dark:from-obsidian/12 dark:via-obsidian/30 dark:to-obsidian/82' />
         <AmbientBackground density={22} />
-        <div className='relative z-10 mx-auto flex max-w-5xl flex-col items-center px-6 py-10 text-center sm:px-10 sm:py-14'>
+        <div className='relative z-10 mx-auto flex max-w-5xl flex-col items-center  sm:px-10 sm:py-14'>
           <motion.span initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }} className='section-label mb-6'>
             <span>Shop With Class - Verified - Delivered</span>
           </motion.span>
