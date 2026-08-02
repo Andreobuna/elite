@@ -1,4 +1,4 @@
-﻿/** @type {import('tailwindcss').Config} */
+/** @type {import('tailwindcss').Config} */
 module.exports = {
   content: ['./src/**/*.{js,ts,jsx,tsx,mdx}'],
   theme: {
@@ -35,6 +35,11 @@ module.exports = {
           '0%': { backgroundPosition: '0% 50%' },
           '100%': { backgroundPosition: '200% 50%' },
         },
+        'gradient-pan': {
+          '0%': { backgroundPosition: '0% 50%' },
+          '50%': { backgroundPosition: '100% 50%' },
+          '100%': { backgroundPosition: '0% 50%' },
+        },
         float: {
           '0%, 100%': { transform: 'translateY(0px) rotate(0deg)' },
           '50%': { transform: 'translateY(-14px) rotate(1deg)' },
@@ -42,6 +47,39 @@ module.exports = {
         'float-slow': {
           '0%, 100%': { transform: 'translateY(0px)' },
           '50%': { transform: 'translateY(-22px)' },
+        },
+        drift: {
+          '0%': { transform: 'translate3d(0, 0, 0)' },
+          '25%': { transform: 'translate3d(10px, -14px, 0)' },
+          '50%': { transform: 'translate3d(-8px, -28px, 0)' },
+          '75%': { transform: 'translate3d(-14px, -10px, 0)' },
+          '100%': { transform: 'translate3d(0, 0, 0)' },
+        },
+        orbit: {
+          '0%': { transform: 'rotate(0deg) translateX(0px) rotate(0deg)' },
+          '100%': { transform: 'rotate(360deg) translateX(0px) rotate(-360deg)' },
+        },
+        sheen: {
+          '0%': { transform: 'translateX(-120%) skewX(-18deg)', opacity: '0' },
+          '20%': { opacity: '0.85' },
+          '50%': { opacity: '0.45' },
+          '100%': { transform: 'translateX(140%) skewX(-18deg)', opacity: '0' },
+        },
+        scanline: {
+          '0%': { transform: 'translateY(-120%)' },
+          '100%': { transform: 'translateY(220%)' },
+        },
+        breathe: {
+          '0%, 100%': { transform: 'scale(1)', opacity: '0.65' },
+          '50%': { transform: 'scale(1.05)', opacity: '1' },
+        },
+        tilt: {
+          '0%, 100%': { transform: 'rotate(-0.8deg)' },
+          '50%': { transform: 'rotate(0.8deg)' },
+        },
+        'soft-bounce': {
+          '0%, 100%': { transform: 'translateY(0px)' },
+          '50%': { transform: 'translateY(-10px)' },
         },
         'fade-up': {
           '0%': { opacity: '0', transform: 'translateY(24px)' },
@@ -66,8 +104,16 @@ module.exports = {
       },
       animation: {
         shimmer: 'shimmer 3s linear infinite',
+        'gradient-pan': 'gradient-pan 14s ease-in-out infinite',
         float: 'float 6s ease-in-out infinite',
         'float-slow': 'float-slow 9s ease-in-out infinite',
+        drift: 'drift 18s ease-in-out infinite',
+        orbit: 'orbit 22s linear infinite',
+        sheen: 'sheen 8s linear infinite',
+        scanline: 'scanline 6s linear infinite',
+        breathe: 'breathe 4s ease-in-out infinite',
+        tilt: 'tilt 9s ease-in-out infinite',
+        'soft-bounce': 'soft-bounce 5s ease-in-out infinite',
         'fade-up': 'fade-up 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards',
         'seal-rotate': 'seal-rotate 18s linear infinite',
         marquee: 'marquee 28s linear infinite',
