@@ -3,14 +3,14 @@
 @tailwind utilities;
 
 :root {
-  --color-bg: 12 9 7;
-  --color-panel: 27 20 14;
-  --color-surface: 40 30 21;
-  --color-text: 247 241 232;
-  --color-muted: 164 149 128;
-  --color-accent: 212 175 55;
-  --color-accent-strong: 156 127 36;
-  --color-ink: 18 14 12;
+  --color-bg: 4 10 28;
+  --color-panel: 9 21 45;
+  --color-surface: 15 35 71;
+  --color-text: 248 251 255;
+  --color-muted: 164 189 221;
+  --color-accent: 56 149 255;
+  --color-accent-strong: 21 104 214;
+  --color-ink: 2 8 19;
   --text-shadow: 0 3px 16px rgb(0 0 0 / 0.92), 0 0 2px rgb(0 0 0 / 0.98);
   color-scheme: dark;
 }
@@ -23,7 +23,7 @@ html.light {
   --color-muted: 118 99 80;
   --color-accent: 176 124 49;
   --color-accent-strong: 131 88 29;
-  --color-ink: 18 14 12;
+  --color-ink: 2 8 19;
   --text-shadow: 0 2px 8px rgb(255 255 255 / 0.2), 0 2px 8px rgb(0 0 0 / 0.35);
   color-scheme: light;
 }
@@ -332,3 +332,4 @@ body {
     }
   }
 }
+
