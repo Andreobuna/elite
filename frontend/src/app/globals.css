@@ -1,4 +1,4 @@
-@tailwind base;
+﻿@tailwind base;
 @tailwind components;
 @tailwind utilities;
 
@@ -13,19 +13,6 @@
   --color-ink: 2 8 19;
   --text-shadow: 0 3px 16px rgb(0 0 0 / 0.92), 0 0 2px rgb(0 0 0 / 0.98);
   color-scheme: dark;
-}
-
-html.light {
-  --color-bg: 247 240 228;
-  --color-panel: 255 250 243;
-  --color-surface: 241 231 218;
-  --color-text: 49 34 20;
-  --color-muted: 118 99 80;
-  --color-accent: 176 124 49;
-  --color-accent-strong: 131 88 29;
-  --color-ink: 2 8 19;
-  --text-shadow: 0 2px 8px rgb(255 255 255 / 0.2), 0 2px 8px rgb(0 0 0 / 0.35);
-  color-scheme: light;
 }
 
 * {
@@ -332,4 +319,3 @@ body {
     }
   }
 }
-

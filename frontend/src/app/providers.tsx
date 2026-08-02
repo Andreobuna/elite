@@ -3,7 +3,6 @@
 import { useState } from 'react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Toaster } from 'react-hot-toast';
-import ThemeToggle from '@/components/ThemeToggle';
 
 export default function Providers({ children }: { children: React.ReactNode }) {
   const [client] = useState(() => new QueryClient({
@@ -24,7 +23,6 @@ export default function Providers({ children }: { children: React.ReactNode }) {
           success: { iconTheme: { primary: 'rgb(var(--color-accent))', secondary: 'rgb(var(--color-ink))' } },
         }}
       />
-      <ThemeToggle className="fixed bottom-5 right-5 z-[60] shadow-gold-lg" />
     </QueryClientProvider>
   );
 }
