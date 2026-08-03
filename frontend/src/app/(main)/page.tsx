@@ -6,6 +6,7 @@ import { motion } from 'framer-motion';
 import { useQuery } from '@tanstack/react-query';
 import { ArrowRight, ShieldCheck, Truck, RefreshCcw, Sparkles } from 'lucide-react';
 import { api } from '@/lib/api';
+import { useMinimumLoadingState } from '@/lib/useMinimumLoadingState';
 import AmbientBackground from '@/components/AmbientBackground';
 import ProductCard, { ProductCardData } from '@/components/ProductCard';
 import tenImage from '../../../ten.png';
@@ -121,7 +122,9 @@ export default function HomePage() {
 }
 
 function ProductGrid({ query, columns = 4, emptyHint }: { query: ReturnType<typeof useProducts>; columns?: number; emptyHint?: string; }) {
-  if (query.isLoading) {
+  const showLoading = useMinimumLoadingState(query.isLoading);
+
+  if (showLoading) {
     return <div className={columns === 3 ? 'grid grid-cols-2 gap-5 sm:grid-cols-3' : 'grid grid-cols-2 gap-5 sm:grid-cols-4'}>{Array.from({ length: columns }).map((_, i) => <div key={i} className='skeleton aspect-square rounded-2xl' />)}</div>;
   }
 
@@ -131,5 +134,3 @@ function ProductGrid({ query, columns = 4, emptyHint }: { query: ReturnType<type
 
   return <div className={columns === 3 ? 'grid grid-cols-2 gap-5 sm:grid-cols-3' : 'grid grid-cols-2 gap-5 sm:grid-cols-4'}>{query.data.map((p, i) => <ProductCard key={p.id} product={p} index={i} fallbackImage={showcaseImages[i % showcaseImages.length]} />)}</div>;
 }
-
-
