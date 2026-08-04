@@ -22,7 +22,7 @@ const columns = [
   {
     title: 'Company',
     links: [
-      { href: '/about', label: 'About Elite X' },
+      { href: '/about', label: 'About Elite X Shop' },
       { href: '/privacy', label: 'Privacy Policy' },
       { href: '/terms', label: 'Terms of Service' },
     ],
@@ -66,5 +66,4 @@ export default function Footer() {
     </footer>
   );
 }
-
 
