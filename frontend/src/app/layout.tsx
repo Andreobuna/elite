@@ -1,4 +1,4 @@
-import type { Metadata } from 'next'
+﻿import type { Metadata } from 'next'
 import { Playfair_Display, Inter, Space_Grotesk } from 'next/font/google'
 import './globals.css'
 import Providers from './providers'
@@ -24,8 +24,11 @@ export const metadata: Metadata = {
     statusBarStyle: 'black-translucent',
   },
   icons: {
-    icon: [{ url: '/elite-logo.svg', type: 'image/svg+xml' }],
-    apple: [{ url: '/elite-logo.svg', type: 'image/svg+xml' }],
+    icon: [
+      { url: '/dam.png', type: 'image/png' },
+      { url: '/dam.png', type: 'image/png', sizes: '512x512' },
+    ],
+    apple: [{ url: '/dam.png', type: 'image/png' }],
   },
 }
 
@@ -38,3 +41,4 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     </html>
   )
 }
+

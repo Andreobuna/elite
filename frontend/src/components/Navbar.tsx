@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -47,7 +47,7 @@ export default function Navbar() {
   return (
     <header className='sticky top-0 z-50 border-b border-white/5 bg-obsidian/80 backdrop-blur-xl'>
       <div className='mx-auto flex max-w-7xl items-center justify-between px-4 py-2 md:px-6 lg:px-8 lg:py-3'>
-        <Logo size={72} />
+        <Logo size={104} />
 
         <nav className='hidden items-center gap-5 lg:flex'>
           {links.map((l) => (

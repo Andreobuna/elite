@@ -1,5 +1,5 @@
-const CACHE_NAME = 'elite-x-shop-v3';
-const APP_SHELL = ['/', '/manifest.webmanifest', '/elite-logo.svg'];
+﻿const CACHE_NAME = 'elite-x-shop-v4';
+const APP_SHELL = ['/', '/manifest.webmanifest', '/dam.png'];
 
 self.addEventListener('install', (event) => {
   event.waitUntil(caches.open(CACHE_NAME).then((cache) => cache.addAll(APP_SHELL)).then(() => self.skipWaiting()));
@@ -45,3 +45,4 @@ self.addEventListener('fetch', (event) => {
     }
   })());
 });
+

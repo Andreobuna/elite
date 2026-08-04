@@ -1,4 +1,4 @@
-{
+﻿{
   "name": "Elite X Shop",
   "short_name": "Elite X",
   "description": "Premium essentials with discreet delivery and transparent pricing.",
@@ -9,10 +9,11 @@
   "theme_color": "#040a1c",
   "icons": [
     {
-      "src": "/elite-logo.svg",
-      "sizes": "any",
-      "type": "image/svg+xml",
+      "src": "/dam.png",
+      "sizes": "512x512",
+      "type": "image/png",
       "purpose": "any maskable"
     }
   ]
 }
+
