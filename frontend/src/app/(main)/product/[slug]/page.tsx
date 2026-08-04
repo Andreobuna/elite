@@ -49,7 +49,7 @@ export default function ProductDetailPage() {
     return (
       <main className="mx-auto max-w-7xl px-6 py-16">
         <div className="grid gap-10 lg:grid-cols-2">
-          <div className="skeleton aspect-square rounded-2xl" />
+          <div className="skeleton mx-auto aspect-[4/5] w-full max-w-[480px] rounded-2xl" />
           <div className="space-y-4">
             <div className="skeleton h-8 w-2/3 rounded-lg" />
             <div className="skeleton h-4 w-1/3 rounded-lg" />
@@ -84,7 +84,7 @@ export default function ProductDetailPage() {
       <div className="grid gap-12 lg:grid-cols-2">
         <div>
           <div
-            className="group relative aspect-square cursor-zoom-in overflow-hidden rounded-2xl border border-white/5 bg-graphite"
+            className="group relative aspect-[4/5] w-full max-w-[480px] cursor-zoom-in overflow-hidden rounded-2xl border border-white/5 bg-graphite"
             onMouseEnter={() => setZoomed(true)}
             onMouseLeave={() => setZoomed(false)}
           >

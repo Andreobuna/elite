@@ -112,11 +112,11 @@ export default function CartPage() {
             </div>
             <div className="mt-2 flex justify-between text-sm text-slate">
               <span>Shipping</span>
-              <span className="text-ivory">{subtotal > 50000 ? 'Free' : formatNaira(5990)}</span>
+              <span className="text-ivory">{subtotal > 50000 ? 'Free' : formatNaira(2000)}</span>
             </div>
             <div className="mt-4 flex justify-between border-t border-white/10 pt-4 font-display text-lg text-ivory">
               <span>Total</span>
-              <span className="text-gold">{formatNaira(subtotal + (subtotal > 50000 ? 0 : 5990))}</span>
+              <span className="text-gold">{formatNaira(subtotal + (subtotal > 50000 ? 0 : 2000))}</span>
             </div>
             <Link href="/checkout" className="btn-gold mt-6 w-full">
               Checkout <ArrowRight size={16} />

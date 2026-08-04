@@ -47,7 +47,7 @@ export async function createOrder(req: AuthedRequest, res: Response, next: NextF
       }
     }
 
-    const shippingTotal = 199;
+    const shippingTotal = 2000;
     const grandTotal = Math.max(subtotal - discountTotal + shippingTotal, 0);
     const orderNumber = 'EXS-' + Date.now().toString(36).toUpperCase();
     const user = await prisma.user.findUnique({ where: { id: userId } });
