@@ -9,9 +9,9 @@
   "theme_color": "#040a1c",
   "icons": [
     {
-      "src": "/elite-logo.svg",
+      "src": "/dam.png",
       "sizes": "any",
-      "type": "image/svg+xml",
+      "type": "image/png",
       "purpose": "any maskable"
     }
   ]
