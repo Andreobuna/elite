@@ -24,8 +24,8 @@ export const metadata: Metadata = {
     statusBarStyle: 'black-translucent',
   },
   icons: {
-    icon: [{ url: '/dam.png', type: 'image/png' }],
-    apple: [{ url: '/dam.png', type: 'image/png' }],
+    icon: [{ url: '/elite-logo.svg', type: 'image/svg+xml' }],
+    apple: [{ url: '/elite-logo.svg', type: 'image/svg+xml' }],
   },
 }
 

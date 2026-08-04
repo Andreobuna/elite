@@ -9,7 +9,7 @@ export default function Logo({ size = 86 }: { size?: number }) {
     <Link href='/' className='inline-flex shrink-0 items-center' aria-label='Elite X Shop home'>
       <span className='relative block' style={{ width: width + 'px', height: height + 'px' }}>
         <Image
-          src='/dam.png'
+          src='/elite-logo.svg'
           alt='Elite X Shop logo'
           fill
           priority
