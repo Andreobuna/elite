@@ -79,7 +79,6 @@ async function finalizePaystackPayment(reference: string, userId?: string) {
 
   return { payment, order: payment.order, alreadyVerified: true };
 }
-
 export async function verifyPaystackPayment(req: AuthedRequest, res: Response, next: NextFunction) {
   try {
     const reference = String(req.body?.reference ?? req.query.reference ?? '').trim();
