@@ -1,8 +1,8 @@
 import Link from "next/link";
 
 export default function Logo({ size = 40 }: { size?: number }) {
-  const maxWidth = Math.round(size * 3);
-  const minWidth = Math.max(80, Math.round(size * 2.1));
+  const minWidth = Math.max(48, Math.round(size * 1.6));
+  const maxWidth = Math.max(minWidth + 8, Math.round(size * 2.6));
   const width = "clamp(" + minWidth + "px, 18vw, " + maxWidth + "px)";
 
   return (
