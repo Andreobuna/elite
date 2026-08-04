@@ -1,0 +1,39 @@
+<svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="96" y1="60" x2="412" y2="450" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#122145"/>
+      <stop offset="1" stop-color="#040813"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(186 120) rotate(54) scale(215 208)">
+      <stop stop-color="#4F97FF" stop-opacity="0.65"/>
+      <stop offset="1" stop-color="#4F97FF" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="amberGlow" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(338 340) rotate(-20) scale(160 96)">
+      <stop stop-color="#F7E198" stop-opacity="0.45"/>
+      <stop offset="1" stop-color="#F7E198" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="gold" x1="140" y1="124" x2="380" y2="396" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FFF2BE"/>
+      <stop offset="0.48" stop-color="#F6D36A"/>
+      <stop offset="1" stop-color="#D69524"/>
+    </linearGradient>
+    <linearGradient id="panel" x1="146" y1="118" x2="366" y2="388" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#17264A"/>
+      <stop offset="1" stop-color="#070D1C"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="512" height="512" rx="120" fill="url(#bg)"/>
+  <rect width="512" height="512" rx="120" fill="url(#glow)"/>
+  <circle cx="256" cy="256" r="206" fill="none" stroke="#F7E198" stroke-opacity="0.88" stroke-width="16"/>
+  <circle cx="256" cy="256" r="180" fill="none" stroke="#FFFFFF" stroke-opacity="0.18" stroke-width="4"/>
+  <circle cx="256" cy="256" r="174" fill="url(#panel)" stroke="#4F97FF" stroke-opacity="0.35" stroke-width="5"/>
+  <ellipse cx="332" cy="365" rx="110" ry="62" fill="url(#amberGlow)"/>
+
+  <path d="M158 192H220V220H186V242H218V270H186V318H158V192Z" fill="url(#gold)"/>
+  <path d="M334.56 180H366L307.92 257.76L369.6 340H337.2L293.52 281.28L250.56 340H219.12L279.36 259.44L218.88 180H251.28L295.2 239.76L334.56 180Z" fill="url(#gold)"/>
+
+  <path d="M296 176C296 168.82 301.82 163 309 163H314C321.18 163 327 168.82 327 176C327 183.18 321.18 189 314 189H309C301.82 189 296 183.18 296 176Z" fill="#FFF6D7" fill-opacity="0.94"/>
+  <path d="M124 349L142 331L160 349L142 367L124 349Z" fill="#F7E198" fill-opacity="0.86"/>
+  <path d="M355 128L363 120L371 128L363 136L355 128Z" fill="#F7E198" fill-opacity="0.86"/>
+</svg>

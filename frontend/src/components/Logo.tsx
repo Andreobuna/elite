@@ -1,4 +1,4 @@
-﻿import Image from 'next/image';
+import Image from 'next/image';
 import Link from 'next/link';
 
 export default function Logo({ size = 40 }: { size?: number }) {
@@ -6,7 +6,7 @@ export default function Logo({ size = 40 }: { size?: number }) {
     <Link href="/" className="flex items-center gap-3 group" aria-label="Elite X Shop home">
       <div className="relative shrink-0 overflow-hidden rounded-2xl border border-gold/25 bg-charcoal/70 shadow-gold" style={{ width: size, height: size }}>
         <Image
-          src="/elite-logo.jpg"
+          src="/elite-logo.svg"
           alt="Elite X Shop logo"
           fill
           priority

@@ -1,0 +1,18 @@
+{
+  "name": "Elite X Shop",
+  "short_name": "Elite X",
+  "description": "Premium essentials with discreet delivery and transparent pricing.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#040a1c",
+  "theme_color": "#040a1c",
+  "icons": [
+    {
+      "src": "/elite-logo.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
